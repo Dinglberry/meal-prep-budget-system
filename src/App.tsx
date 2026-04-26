@@ -320,6 +320,8 @@ export default function App() {
                   <input style={{ ...s.fieldInput, flex: 2 }} value={ing.item} onChange={(e) => updateIngredient(i, "item", e.target.value)} placeholder="Ingredient" />
                   <button style={s.removeRowBtn} onClick={() => setEditingRecipe((prev) => prev ? { ...prev, ingredients: prev.ingredients.filter((_, idx) => idx !== i) } : prev)}>✕</button>
                 </div>
+               
+},
               ))}
             </div>
 
@@ -479,6 +481,30 @@ export default function App() {
                         </div>
                         {recipe.ingredients.length > 0 && (
                           <div style={s.expandSection}>
+                            <div
+  style={{
+    background: "#fff8ea",
+    border: "1px solid #6f6658",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 16,
+  }}
+>
+  <h3 style={{ marginBottom: 10 }}>Nutrition Info</h3>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 10,
+    }}
+  >
+    <div>Calories: {selectedRecipe.macros.calories}</div>
+    <div>Protein: {selectedRecipe.macros.protein}g</div>
+    <div>Carbs: {selectedRecipe.macros.carbs}g</div>
+    <div>Fat: {selectedRecipe.macros.fat}g</div>
+  </div>
+</div>
                             <div style={s.expandTitle}>Ingredients</div>
                             {recipe.ingredients.map((ing) => <div key={ing.item} style={s.expandRow}><span style={s.expandDot}>·</span><span>{ing.amount} {ing.item}</span></div>)}
                           </div>
