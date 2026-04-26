@@ -583,9 +583,9 @@ export default function App() {
                     <div style={s.groceryPriceWrap}>
                       <span style={s.groceryDollar}>$</span>
                       <input
-                        type="number"
-                        step="0.01"
+                        type="text"
                         inputMode="decimal"
+                        pattern="[0-9]*\.?[0-9]*"
                         style={s.groceryCostInput}
                         value={item.estimatedCost === 0 ? "" : item.estimatedCost}
                         onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)}
@@ -684,32 +684,32 @@ export default function App() {
               <div style={s.disclaimer}>This is a food-pattern check only, not medical advice. Speak with a doctor or dietitian about supplements.</div>
             </div>
 
-            {/* Foods eaten most from planner */}
-            <div style={s.sectionLabel}>Foods You Eat Most This Week</div>
+            {/* Meals eaten most from planner */}
+            <div style={s.sectionLabel}>Meals You Eat Most This Week</div>
             <div style={s.insightCard}>
               {(() => {
-                // Count ingredient frequency across planned recipes
-                const foodCount: Record<string, number> = {};
-                weeklyRecipes.forEach((recipe) => {
-                  recipe.ingredients.forEach((ing) => {
-                    const key = ing.item.toLowerCase().trim();
-                    if (key) foodCount[key] = (foodCount[key] || 0) + 1;
+                // Count recipe frequency across the weekly plan
+                const mealCount: Record<string, number> = {};
+                Object.values(plan).forEach((day) => {
+                  Object.values(day).forEach((id) => {
+                    if (id) mealCount[id] = (mealCount[id] || 0) + 1;
                   });
                 });
-                const sorted = Object.entries(foodCount)
-                  .sort((a, b) => b[1] - a[1])
-                  .slice(0, 10);
+                const sorted = Object.entries(mealCount)
+                  .map(([id, count]) => ({ recipe: recipes.find((r) => r.id === id), count }))
+                  .filter((x) => x.recipe)
+                  .sort((a, b) => b.count - a.count);
                 return sorted.length === 0 ? (
-                  <div style={{ color: "#8b7d6b", fontSize: 13, fontStyle: "italic" }}>Plan your meals to see your most-eaten foods.</div>
+                  <div style={{ color: "#8b7d6b", fontSize: 13, fontStyle: "italic" }}>Plan your meals to see which ones you eat most.</div>
                 ) : (
                   <>
-                    {sorted.map(([food, count], i) => (
-                      <div key={food} style={s.foodFreqRow}>
+                    {sorted.map(({ recipe, count }, i) => recipe && (
+                      <div key={recipe.id} style={s.foodFreqRow}>
                         <span style={s.foodFreqRank}>{i + 1}</span>
                         <div style={s.foodFreqBarWrap}>
-                          <div style={s.foodFreqLabel}>{food.charAt(0).toUpperCase() + food.slice(1)}</div>
+                          <div style={s.foodFreqLabel}>{recipe.name}</div>
                           <div style={s.foodFreqTrack}>
-                            <div style={{ ...s.foodFreqFill, width: `${Math.round((count / sorted[0][1]) * 100)}%` }} />
+                            <div style={{ ...s.foodFreqFill, width: `${Math.round((count / sorted[0].count) * 100)}%` }} />
                           </div>
                         </div>
                         <span style={s.foodFreqCount}>{count}x</span>
