@@ -1,6 +1,4 @@
-bash
 
-cat > /home/claude/fixed-App.tsx << 'ENDOFFILE'
 import React, { useMemo, useState } from "react";
 import {
   ALL_CATEGORIES,
@@ -353,13 +351,52 @@ export default function App() {
             <div style={s.fieldGroup}>
               <div style={s.fieldLabelRow}>
                 <div style={s.fieldLabel}>Ingredients</div>
-                <button style={s.addRowBtn} onClick={() => setEditingRecipe((prev) => prev ? { ...prev, ingredients: [...prev.ingredients, { item: "", amount: "" }] } : prev)}>+ Add</button>
+                <button
+                  style={s.addRowBtn}
+                  onClick={() =>
+                    setEditingRecipe((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            ingredients: [...prev.ingredients, { item: "", amount: "" }],
+                          }
+                        : prev
+                    )
+                  }
+                >
+                  + Add
+                </button>
               </div>
+
               {editingRecipe.ingredients.map((ing, i) => (
                 <div key={i} style={s.ingredientRow}>
-                  <input style={{ ...s.fieldInput, flex: 1 }} value={ing.amount} onChange={(e) => updateIngredient(i, "amount", e.target.value)} placeholder="Amount" />
-                  <input style={{ ...s.fieldInput, flex: 2 }} value={ing.item} onChange={(e) => updateIngredient(i, "item", e.target.value)} placeholder="Ingredient" />
-                  <button style={s.removeRowBtn} onClick={() => setEditingRecipe((prev) => prev ? { ...prev, ingredients: prev.ingredients.filter((_, idx) => idx !== i) } : prev)}>✕</button>
+                  <input
+                    style={{ ...s.fieldInput, flex: 1 }}
+                    value={ing.amount}
+                    onChange={(e) => updateIngredient(i, "amount", e.target.value)}
+                    placeholder="Amount"
+                  />
+                  <input
+                    style={{ ...s.fieldInput, flex: 2 }}
+                    value={ing.item}
+                    onChange={(e) => updateIngredient(i, "item", e.target.value)}
+                    placeholder="Ingredient"
+                  />
+                  <button
+                    style={s.removeRowBtn}
+                    onClick={() =>
+                      setEditingRecipe((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              ingredients: prev.ingredients.filter((_, idx) => idx !== i),
+                            }
+                          : prev
+                      )
+                    }
+                  >
+                    ✕
+                  </button>
                 </div>
               ))}
             </div>
@@ -952,8 +989,3 @@ const s: Record<string, React.CSSProperties> = {
   toggleChip: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 99, padding: "7px 14px", color: "#8b7d6b", fontSize: 12, cursor: "pointer" },
   toggleChipOn: { background: "#7c8a6422", border: "1.5px solid #7c8a64", color: "#4d5a3d" },
 };
-ENDOFFILE
-echo "Lines: $(wc -l < /home/claude/fixed-App.tsx)"
-Output
-
-Lines: 941
