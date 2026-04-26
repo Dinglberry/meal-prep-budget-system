@@ -42,7 +42,7 @@ function slugify(name: string) {
   return name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
 }
 
-type EditableGrocery = { name: string; category: string; uses: number; estimatedCost: number };
+type EditableGrocery = { name: string; category: string; uses: number; estimatedCost: number; priceText?: string };
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
@@ -235,7 +235,22 @@ export default function App() {
   }
 
   function updateGrocery(i: number, field: keyof EditableGrocery, value: string) {
-    setEditableGroceries((prev) => prev.map((item, idx) => idx === i ? { ...item, [field]: field === "estimatedCost" ? Number(value) || 0 : value } : item));
+    setEditableGroceries((prev) => prev.map((item, idx) => {
+      if (idx !== i) return item;
+      if (field === "estimatedCost") {
+        // Store raw text so user can type "1.00" freely; parse on blur
+        return { ...item, priceText: value, estimatedCost: item.estimatedCost };
+      }
+      return { ...item, [field]: value };
+    }));
+  }
+
+  function commitPrice(i: number) {
+    setEditableGroceries((prev) => prev.map((item, idx) => {
+      if (idx !== i) return item;
+      const parsed = parseFloat(item.priceText ?? String(item.estimatedCost));
+      return { ...item, estimatedCost: isNaN(parsed) ? 0 : Math.round(parsed * 100) / 100, priceText: undefined };
+    }));
   }
 
   function addGroceryItem() {
@@ -585,10 +600,10 @@ export default function App() {
                       <input
                         type="text"
                         inputMode="decimal"
-                        pattern="[0-9]*\.?[0-9]*"
                         style={s.groceryCostInput}
-                        value={item.estimatedCost === 0 ? "" : item.estimatedCost}
+                        value={item.priceText !== undefined ? item.priceText : (item.estimatedCost === 0 ? "" : String(item.estimatedCost))}
                         onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)}
+                        onBlur={() => commitPrice(i)}
                         placeholder="0.00"
                       />
                     </div>
