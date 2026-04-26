@@ -541,47 +541,63 @@ export default function App() {
           <div style={s.screen}>
             <div style={s.pageHeader}><div style={s.pageTitle}>Budget & Groceries</div></div>
 
+            {/* Weekly summary card */}
             <div style={s.budgetCard}>
               <div style={s.budgetCardRow}>
                 <div>
+                  <div style={s.budgetSectionTitle}>Weekly</div>
                   <div style={s.budgetBig}>{currency(editableTotal)}</div>
-                  <div style={s.budgetSub}>of {currency(budgetTarget)} target</div>
+                  <div style={s.budgetSub}>{budgetRemaining >= 0 ? `${currency(budgetRemaining)} left` : `${currency(Math.abs(budgetRemaining))} over`}</div>
                 </div>
-                <div style={{ ...s.budgetPill, background: budgetRemaining >= 0 ? "#a8e6cf22" : "#ff6b6b22", color: budgetRemaining >= 0 ? "#a8e6cf" : "#ff6b6b", border: `1px solid ${budgetRemaining >= 0 ? "#a8e6cf44" : "#ff6b6b44"}` }}>
-                  {budgetRemaining >= 0 ? `${currency(budgetRemaining)} left` : `${currency(Math.abs(budgetRemaining))} over`}
+                <div style={s.budgetDivider} />
+                <div>
+                  <div style={s.budgetSectionTitle}>Monthly (est.)</div>
+                  <div style={s.budgetBigMonthly}>{currency(Number((editableTotal * 4.33).toFixed(2)))}</div>
+                  <div style={s.budgetSub}>{currency(Number((budgetTarget * 4.33).toFixed(2)))} target</div>
                 </div>
               </div>
               <div style={s.budgetTrack}>
-                <div style={{ ...s.budgetFill, width: `${budgetPercent}%`, background: budgetRemaining >= 0 ? "#a8e6cf" : "#ff6b6b" }} />
+                <div style={{ ...s.budgetFill, width: `${budgetPercent}%`, background: budgetRemaining >= 0 ? "#7c8a64" : "#c97b5a" }} />
               </div>
             </div>
 
-            <div style={s.sectionLabel}>Budget Target</div>
+            {/* Budget targets */}
+            <div style={s.sectionLabel}>Weekly Budget Target</div>
             <div style={s.budgetTargetRow}>
               <span style={s.budgetTargetLabel}>$</span>
               <input type="number" style={s.budgetTargetInput} value={budgetTarget} onChange={(e) => setBudgetTarget(Number(e.target.value) || 0)} />
               <button style={s.resetBtn} onClick={resetBudget}>↺ Reset</button>
             </div>
 
-            <div style={s.sectionLabel}>Grocery List</div>
+            {/* Grocery list */}
+            <div style={s.sectionLabel}>Grocery List · enter your actual prices</div>
             <button style={s.addGroceryBtn} onClick={addGroceryItem}>+ Add Item</button>
             <div style={s.groceryList}>
               {editableGroceries.map((item, i) => (
                 <div key={`${item.name}-${i}`} style={s.groceryEditRow}>
                   <div style={s.groceryEditLeft}>
                     <input style={s.groceryEditInput} value={item.name} onChange={(e) => updateGrocery(i, "name", e.target.value)} placeholder="Item name" />
-                    <input style={{ ...s.groceryEditInput, fontSize: 11, color: "#6b7280" }} value={item.category} onChange={(e) => updateGrocery(i, "category", e.target.value)} placeholder="Category" />
+                    <input style={{ ...s.groceryEditInput, fontSize: 11, color: "#8b7d6b", fontWeight: 400 }} value={item.category} onChange={(e) => updateGrocery(i, "category", e.target.value)} placeholder="Category" />
                   </div>
                   <div style={s.groceryEditRight}>
-                    <span style={s.groceryUses}>{item.uses}x</span>
-                    <input type="number" style={s.groceryCostInput} value={item.estimatedCost} onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)} />
+                    <div style={s.groceryPriceWrap}>
+                      <span style={s.groceryDollar}>$</span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        style={s.groceryCostInput}
+                        value={item.estimatedCost}
+                        onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)}
+                        placeholder="0.00"
+                      />
+                    </div>
                     <button style={s.groceryDeleteBtn} onClick={() => deleteGroceryItem(i)}>✕</button>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div style={s.sectionLabel}>Portion Rules</div>
+            <div style={s.sectionLabel}>Portion Rules</div>            <div style={s.sectionLabel}>Portion Rules</div>
             <div style={s.rulesCard}>
               {["Greek yogurt: 3/4 cup max", "Rice: 1 cup cooked max", "Chicken: 4 oz standard", "Almond butter: 1 tbsp", "No tomatoes · Low spice"].map((rule) => (
                 <div key={rule} style={s.ruleRow}><span style={s.ruleDot}>◆</span><span>{rule}</span></div>
@@ -820,7 +836,12 @@ const s: Record<string, React.CSSProperties> = {
   groceryEditInput: { background: "transparent", border: "none", color: "#2f2a24", fontSize: 14, fontWeight: 700, outline: "none", width: "100%", fontFamily: "Georgia, serif" },
   groceryEditRight: { display: "flex", alignItems: "center", gap: 8, flexShrink: 0 },
   groceryUses: { fontSize: 11, color: "#c9b99a" },
-  groceryCostInput: { width: 60, background: "#f4efe3", border: "1.5px solid #c9b99a", borderRadius: 8, padding: "4px 8px", color: "#4d5a3d", fontSize: 13, fontWeight: 700, textAlign: "right" },
+  budgetSectionTitle: { fontSize: 10, fontWeight: 700, color: "#8b7d6b", textTransform: "uppercase" as const, letterSpacing: "0.12em", marginBottom: 4 },
+  budgetBigMonthly: { fontSize: 24, fontWeight: 700, color: "#2f2a24", fontFamily: "Georgia, serif" },
+  budgetDivider: { width: 1, background: "#e0d4c0", alignSelf: "stretch", margin: "0 4px" },
+  groceryPriceWrap: { display: "flex", alignItems: "center", gap: 2, background: "#f4efe3", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "4px 8px" },
+  groceryDollar: { fontSize: 13, fontWeight: 700, color: "#7c8a64" },
+  groceryCostInput: { width: 54, background: "transparent", border: "none", color: "#4d5a3d", fontSize: 13, fontWeight: 700, textAlign: "right" as const, outline: "none" },
   groceryDeleteBtn: { background: "transparent", border: "none", color: "#c9b99a", fontSize: 14, cursor: "pointer" },
   rulesCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, marginBottom: 24, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
   ruleRow: { display: "flex", gap: 10, fontSize: 13, color: "#3d3530", lineHeight: 1.6 },
