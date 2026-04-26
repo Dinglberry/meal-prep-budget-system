@@ -585,8 +585,9 @@ export default function App() {
                       <input
                         type="number"
                         step="0.01"
+                        inputMode="decimal"
                         style={s.groceryCostInput}
-                        value={item.estimatedCost}
+                        value={item.estimatedCost === 0 ? "" : item.estimatedCost}
                         onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)}
                         placeholder="0.00"
                       />
@@ -683,21 +684,58 @@ export default function App() {
               <div style={s.disclaimer}>This is a food-pattern check only, not medical advice. Speak with a doctor or dietitian about supplements.</div>
             </div>
 
-            {/* Monthly picks */}
-            <div style={s.sectionLabel}>Most Added This Session</div>
+            {/* Foods eaten most from planner */}
+            <div style={s.sectionLabel}>Foods You Eat Most This Week</div>
+            <div style={s.insightCard}>
+              {(() => {
+                // Count ingredient frequency across planned recipes
+                const foodCount: Record<string, number> = {};
+                weeklyRecipes.forEach((recipe) => {
+                  recipe.ingredients.forEach((ing) => {
+                    const key = ing.item.toLowerCase().trim();
+                    if (key) foodCount[key] = (foodCount[key] || 0) + 1;
+                  });
+                });
+                const sorted = Object.entries(foodCount)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 10);
+                return sorted.length === 0 ? (
+                  <div style={{ color: "#8b7d6b", fontSize: 13, fontStyle: "italic" }}>Plan your meals to see your most-eaten foods.</div>
+                ) : (
+                  <>
+                    {sorted.map(([food, count], i) => (
+                      <div key={food} style={s.foodFreqRow}>
+                        <span style={s.foodFreqRank}>{i + 1}</span>
+                        <div style={s.foodFreqBarWrap}>
+                          <div style={s.foodFreqLabel}>{food.charAt(0).toUpperCase() + food.slice(1)}</div>
+                          <div style={s.foodFreqTrack}>
+                            <div style={{ ...s.foodFreqFill, width: `${Math.round((count / sorted[0][1]) * 100)}%` }} />
+                          </div>
+                        </div>
+                        <span style={s.foodFreqCount}>{count}x</span>
+                      </div>
+                    ))}
+                    <div style={s.disclaimer}>Based on your current weekly meal plan.</div>
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Most added recipes */}
+            <div style={s.sectionLabel}>Most Added Recipes This Session</div>
             <div style={s.insightCard}>
               {mostPicked.length === 0 ? (
-                <div style={{ color: "#6b7280", fontSize: 13 }}>Add recipes to your planner to start tracking.</div>
+                <div style={{ color: "#8b7d6b", fontSize: 13, fontStyle: "italic" }}>Add recipes to your planner to start tracking.</div>
               ) : (
-                mostPicked.map(({ recipe, count }) => recipe && (
-                  <div key={recipe.id} style={s.insightRow}>
-                    <span style={s.insightDot}>◆</span>
-                    <span><strong>{recipe.name}</strong> — added {count}x</span>
-                  </div>
-                ))
-              )}
-              {mostPicked.length > 0 && (
-                <button style={{ ...s.resetBtn, marginTop: 12 }} onClick={() => setMonthlyPicks({})}>↺ Reset tracking</button>
+                <>
+                  {mostPicked.map(({ recipe, count }) => recipe && (
+                    <div key={recipe.id} style={s.insightRow}>
+                      <span style={s.insightDot}>◆</span>
+                      <span><strong>{recipe.name}</strong> — added {count}×</span>
+                    </div>
+                  ))}
+                  <button style={{ ...s.resetBtn, marginTop: 8 }} onClick={() => setMonthlyPicks({})}>↺ Reset</button>
+                </>
               )}
             </div>
 
@@ -831,7 +869,7 @@ const s: Record<string, React.CSSProperties> = {
   resetBtn: { background: "#f4efe3", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "7px 12px", color: "#8b7d6b", fontSize: 12, cursor: "pointer" },
   addGroceryBtn: { background: "#7c8a64", border: "1.5px solid #4d5a3d", borderRadius: 12, padding: "10px 16px", color: "#fff8ea", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 12, width: "100%", boxShadow: "2px 2px 0 rgba(79,70,55,0.12)" },
   groceryList: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 },
-  groceryEditRow: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "10px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
+  groceryEditRow: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "14px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
   groceryEditLeft: { flex: 1, display: "flex", flexDirection: "column", gap: 4 },
   groceryEditInput: { background: "transparent", border: "none", color: "#2f2a24", fontSize: 14, fontWeight: 700, outline: "none", width: "100%", fontFamily: "Georgia, serif" },
   groceryEditRight: { display: "flex", alignItems: "center", gap: 8, flexShrink: 0 },
@@ -839,9 +877,9 @@ const s: Record<string, React.CSSProperties> = {
   budgetSectionTitle: { fontSize: 10, fontWeight: 700, color: "#8b7d6b", textTransform: "uppercase" as const, letterSpacing: "0.12em", marginBottom: 4 },
   budgetBigMonthly: { fontSize: 24, fontWeight: 700, color: "#2f2a24", fontFamily: "Georgia, serif" },
   budgetDivider: { width: 1, background: "#e0d4c0", alignSelf: "stretch", margin: "0 4px" },
-  groceryPriceWrap: { display: "flex", alignItems: "center", gap: 2, background: "#f4efe3", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "4px 8px" },
-  groceryDollar: { fontSize: 13, fontWeight: 700, color: "#7c8a64" },
-  groceryCostInput: { width: 54, background: "transparent", border: "none", color: "#4d5a3d", fontSize: 13, fontWeight: 700, textAlign: "right" as const, outline: "none" },
+  groceryPriceWrap: { display: "flex", alignItems: "center", gap: 4, background: "#fff8ea", border: "2px solid #7c8a64", borderRadius: 12, padding: "10px 12px", minWidth: 90 },
+  groceryDollar: { fontSize: 16, fontWeight: 700, color: "#7c8a64" },
+  groceryCostInput: { width: 64, background: "transparent", border: "none", color: "#4d5a3d", fontSize: 18, fontWeight: 700, textAlign: "right" as const, outline: "none" },
   groceryDeleteBtn: { background: "transparent", border: "none", color: "#c9b99a", fontSize: 14, cursor: "pointer" },
   rulesCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, marginBottom: 24, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
   ruleRow: { display: "flex", gap: 10, fontSize: 13, color: "#3d3530", lineHeight: 1.6 },
@@ -863,6 +901,13 @@ const s: Record<string, React.CSSProperties> = {
   insightRow: { display: "flex", gap: 10, fontSize: 13, color: "#3d3530", lineHeight: 1.6 },
   insightDot: { color: "#7c8a64", flexShrink: 0, marginTop: 1, fontSize: 11 },
   disclaimer: { fontSize: 11, color: "#c9b99a", marginTop: 6, lineHeight: 1.5, fontStyle: "italic" },
+  foodFreqRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 8 },
+  foodFreqRank: { fontSize: 11, fontWeight: 700, color: "#c9b99a", width: 16, flexShrink: 0, textAlign: "right" as const },
+  foodFreqBarWrap: { flex: 1 },
+  foodFreqLabel: { fontSize: 13, fontWeight: 600, color: "#2f2a24", marginBottom: 4, textTransform: "capitalize" as const },
+  foodFreqTrack: { height: 5, background: "#f4efe3", borderRadius: 99, overflow: "hidden", border: "1px solid #e0d4c0" },
+  foodFreqFill: { height: "100%", background: "#7c8a64", borderRadius: 99, transition: "width 0.4s ease" },
+  foodFreqCount: { fontSize: 12, fontWeight: 700, color: "#7c8a64", flexShrink: 0, width: 24, textAlign: "right" as const },
 
   editorHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, paddingTop: 8 },
   editorTitle: { fontSize: 18, fontWeight: 700, color: "#2f2a24", fontFamily: "Georgia, serif" },
