@@ -1,6 +1,3 @@
-bash
-
-cat > /home/claude/fixed-App.tsx << 'ENDOFFILE'
 import React, { useMemo, useState } from "react";
 import {
   ALL_CATEGORIES,
@@ -24,6 +21,14 @@ function getRecipeById(id: string, recipeList: Recipe[]) {
   return recipeList.find((r) => r.id === id) ?? null;
 }
 
+const NAV = [
+  { id: "home", label: "Home", icon: "⊙" },
+  { id: "recipes", label: "Recipes", icon: "◈" },
+  { id: "planner", label: "Planner", icon: "▦" },
+  { id: "budget", label: "Budget", icon: "◎" },
+  { id: "insights", label: "Insights", icon: "◬" },
+] as const;
+
 const EMPTY_RECIPE: Omit<Recipe, "id"> = {
   name: "", category: "Bowls", source: "", stomachSafe: true, lowSpice: true, noTomato: true,
   servings: 1, servingSize: "1 serving",
@@ -37,12 +42,11 @@ function slugify(name: string) {
   return name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-" + Date.now();
 }
 
-type EditableGrocery = { name: string; category: string; uses: number; estimatedCost: number; priceText?: string };
+type EditableGrocery = { name: string; category: string; uses: number; estimatedCost: number };
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
-  const [recipePasteText, setRecipePasteText] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
   const [stomachSafeOnly, setStomachSafeOnly] = useState(true);
@@ -54,6 +58,7 @@ export default function App() {
   const [editingRecipe, setEditingRecipe] = useState<(Recipe & { isNew?: boolean }) | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
+  // Budget & groceries
   const [budgetTarget, setBudgetTarget] = useState(WEEKLY_BUDGET_DEFAULT);
   const weeklyRecipes = useMemo(() => {
     return Object.values(plan).flatMap((day) => Object.values(day))
@@ -70,8 +75,13 @@ export default function App() {
   const budgetRemaining = Number((budgetTarget - editableTotal).toFixed(2));
   const budgetPercent = Math.min(100, Math.round((editableTotal / budgetTarget) * 100));
 
+  // Monthly tracking
   const [monthlyPicks, setMonthlyPicks] = useState<Record<string, number>>({});
+
+  // Profile
   const [profile, setProfile] = useState({ age: "", height: "", weight: "", gender: "female" });
+
+  // Macro goals
   const [macroGoals, setMacroGoals] = useState({ calories: 1600, protein: 110, carbs: 160, fat: 55 });
 
   const weeklyMacros = useMemo(() => sumMacros(weeklyRecipes), [weeklyRecipes]);
@@ -107,6 +117,7 @@ export default function App() {
     [currentDayRecipes]
   );
 
+  // Macro gaps
   const macroGaps = {
     calories: macroGoals.calories - averageDailyMacros.calories,
     protein: macroGoals.protein - averageDailyMacros.protein,
@@ -118,13 +129,14 @@ export default function App() {
     macroGaps.calories > 150 && `You're ~${macroGaps.calories} cal under your goal. Add oats, rice, avocado, or almond butter.`,
     macroGaps.calories < -150 && `You're ~${Math.abs(macroGaps.calories)} cal over your goal. Reduce oils, nut butter, or rice portions.`,
     macroGaps.protein > 10 && `You need ~${macroGaps.protein}g more protein. Add Greek yogurt, chicken, eggs, or protein powder.`,
-    macroGaps.protein < -10 && `You're ~${Math.abs(macroGaps.protein)}g over protein. Extra protein is generally fine.`,
+    macroGaps.protein < -10 && `You're ~${Math.abs(macroGaps.protein)}g over protein. You may not need to change anything — extra protein is generally fine.`,
     macroGaps.carbs > 20 && `You need ~${macroGaps.carbs}g more carbs. Add rice, oats, bananas, or whole grain toast.`,
     macroGaps.carbs < -20 && `You're ~${Math.abs(macroGaps.carbs)}g over carbs. Reduce rice, bread, or honey portions.`,
     macroGaps.fat > 10 && `You need ~${macroGaps.fat}g more fat. Add avocado, olive oil, nuts, or eggs.`,
     macroGaps.fat < -10 && `You're ~${Math.abs(macroGaps.fat)}g over fat. Reduce oils or nut butter.`,
   ].filter(Boolean) as string[];
 
+  // Nutrition gap detection
   const nutritionPatterns = {
     protein: weeklyRecipes.some((r) => r.macros.protein >= 20),
     vegetables: weeklyRecipes.some((r) => r.tags.some((t) => ["greens", "vegetables", "spinach", "broccoli", "zucchini"].includes(t.toLowerCase()))),
@@ -151,6 +163,7 @@ export default function App() {
     weightNum >= 180 && "At your entered weight, protein, fiber, potassium-rich foods, and balanced blood-sugar meals may be especially helpful.",
   ].filter(Boolean) as string[];
 
+  // Most picked this session
   const mostPicked = Object.entries(monthlyPicks)
     .map(([id, count]) => ({ recipe: recipes.find((r) => r.id === id), count }))
     .filter((x) => x.recipe)
@@ -222,19 +235,7 @@ export default function App() {
   }
 
   function updateGrocery(i: number, field: keyof EditableGrocery, value: string) {
-    setEditableGroceries((prev) => prev.map((item, idx) => {
-      if (idx !== i) return item;
-      if (field === "estimatedCost") return { ...item, priceText: value, estimatedCost: item.estimatedCost };
-      return { ...item, [field]: value };
-    }));
-  }
-
-  function commitPrice(i: number) {
-    setEditableGroceries((prev) => prev.map((item, idx) => {
-      if (idx !== i) return item;
-      const parsed = parseFloat(item.priceText ?? String(item.estimatedCost));
-      return { ...item, estimatedCost: isNaN(parsed) ? 0 : Math.round(parsed * 100) / 100, priceText: undefined };
-    }));
+    setEditableGroceries((prev) => prev.map((item, idx) => idx === i ? { ...item, [field]: field === "estimatedCost" ? Number(value) || 0 : value } : item));
   }
 
   function addGroceryItem() {
@@ -248,63 +249,6 @@ export default function App() {
   function resetBudget() {
     setBudgetTarget(WEEKLY_BUDGET_DEFAULT);
     setEditableGroceries(baseGroceries.map((item) => ({ name: item.name, category: item.category, uses: item.uses, estimatedCost: item.estimatedCost })));
-  }
-
-  function importRecipeFromText() {
-    const text = recipePasteText.trim();
-    if (!text) { alert("Paste a recipe first."); return; }
-    if (recipes.length >= MAX_RECIPES) { alert(`You can only save up to ${MAX_RECIPES} recipes.`); return; }
-
-    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
-    const name = lines[0] || "Untitled Recipe";
-
-    // Smart parse: find Ingredients and Instructions sections
-    const ingredientIdx = lines.findIndex((l) => /^ingredients?$/i.test(l));
-    const instructionIdx = lines.findIndex((l) => /^(instructions?|directions?|method|steps?)$/i.test(l));
-
-    let ingredientLines: string[] = [];
-    let instructionLines: string[] = [];
-
-    if (ingredientIdx !== -1 && instructionIdx !== -1) {
-      ingredientLines = lines.slice(ingredientIdx + 1, instructionIdx);
-      instructionLines = lines.slice(instructionIdx + 1);
-    } else if (ingredientIdx !== -1) {
-      ingredientLines = lines.slice(ingredientIdx + 1);
-    } else {
-      // fallback: lines 1-7 as ingredients
-      ingredientLines = lines.slice(1, 8);
-    }
-
-    const newRecipe: Recipe = {
-      id: slugify(name),
-      name,
-      category: "Imported",
-      source: "Imported",
-      stomachSafe: true,
-      lowSpice: true,
-      noTomato: false,
-      servings: 1,
-      servingSize: "1 serving",
-      ingredients: ingredientLines.map((line) => {
-  const cleaned = line
-    .replace(/^[-•\d.)\s]+/, "") // remove bullets/numbers
-    .trim();
-
-  const match = cleaned.match(/^([\d/.\s\w]+)\s+(.*)$/);
-
-  return match
-    ? { amount: match[1], item: match[2] }
-    : { amount: "", item: cleaned };
-}),
-      instructions: instructionLines.length > 0 ? instructionLines : ["Edit this recipe to add instructions."],
-      macros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
-      tags: ["imported"],
-      groceryItems: ingredientLines.map((line) => ({ name: line, amount: "", category: "Custom", estimatedCost: 0 })),
-    };
-
-    setRecipes((prev) => [...prev, newRecipe]);
-    setEditingRecipe({ ...newRecipe, isNew: false });
-    setRecipePasteText("");
   }
 
   const todaySlots = currentDayRecipes.filter(({ recipe }) => recipe);
@@ -331,7 +275,7 @@ export default function App() {
               <div style={{ flex: 1 }}>
                 <div style={s.fieldLabel}>Category</div>
                 <select style={s.fieldSelect} value={editingRecipe.category} onChange={(e) => updateField("category", e.target.value)}>
-                  {["Breakfast", "Bowls", "Snacks", "Drinks", "Imported"].map((c) => <option key={c}>{c}</option>)}
+                  {["Breakfast", "Bowls", "Snacks", "Drinks"].map((c) => <option key={c}>{c}</option>)}
                 </select>
               </div>
               <div style={{ flex: 1 }}>
@@ -400,13 +344,6 @@ export default function App() {
   return (
     <div style={s.shell}>
       <div style={s.statusBar} />
-      <nav style={s.topNav}>
-        {(["home", "recipes", "planner", "budget", "insights"] as Screen[]).map((sc) => (
-          <button key={sc} style={{ ...s.topNavBtn, ...(screen === sc ? s.topNavBtnActive : {}) }} onClick={() => setScreen(sc)}>
-            {sc.charAt(0).toUpperCase() + sc.slice(1)}
-          </button>
-        ))}
-      </nav>
       <div style={s.screenWrap}>
 
         {/* ── HOME ── */}
@@ -421,10 +358,10 @@ export default function App() {
             <div style={s.budgetRingCard}>
               <div style={s.ringOuter}>
                 <svg width="120" height="120" viewBox="0 0 120 120">
-                  <circle cx="60" cy="60" r="50" fill="none" stroke="#e0d4c0" strokeWidth="10" />
-                  <circle cx="60" cy="60" r="50" fill="none" stroke={budgetRemaining >= 0 ? "#7c8a64" : "#c97b5a"} strokeWidth="10" strokeDasharray={`${budgetPercent * 3.14} 314`} strokeLinecap="round" transform="rotate(-90 60 60)" />
-                  <text x="60" y="54" textAnchor="middle" fill="#2f2a24" fontSize="15" fontWeight="700">{currency(editableTotal)}</text>
-                  <text x="60" y="72" textAnchor="middle" fill="#8b7d6b" fontSize="10">of {currency(budgetTarget)}</text>
+                  <circle cx="60" cy="60" r="50" fill="none" stroke="#1a1a2e" strokeWidth="10" />
+                  <circle cx="60" cy="60" r="50" fill="none" stroke={budgetRemaining >= 0 ? "#a8e6cf" : "#ff6b6b"} strokeWidth="10" strokeDasharray={`${budgetPercent * 3.14} 314`} strokeLinecap="round" transform="rotate(-90 60 60)" />
+                  <text x="60" y="54" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="700">{currency(editableTotal)}</text>
+                  <text x="60" y="72" textAnchor="middle" fill="#a8e6cf" fontSize="10">of {currency(budgetTarget)}</text>
                 </svg>
               </div>
               <div style={s.ringInfo}>
@@ -441,7 +378,7 @@ export default function App() {
                 const ok = pct >= 80 && pct <= 120;
                 return (
                   <div key={label} style={s.macroChip}>
-                    <div style={{ ...s.macroVal, color: ok ? "#5a6b4a" : "#b06040" }}>{current}{unit}</div>
+                    <div style={{ ...s.macroVal, color: ok ? "#a8e6cf" : "#ffb347" }}>{current}{unit}</div>
                     <div style={s.macroLbl}>{label}</div>
                     <div style={s.macroGoalLbl}>goal {goal}{unit}</div>
                   </div>
@@ -465,6 +402,17 @@ export default function App() {
                 ))}
               </div>
             )}
+
+            <div style={s.sectionLabel}>Quick Access</div>
+            <div style={s.quickGrid}>
+              {([["recipes", "◈", "Recipes", `${recipes.length} meals`], ["planner", "▦", "Planner", "This week"], ["budget", "◎", "Budget", `${editableGroceries.length} items`], ["insights", "◬", "Insights", "Nutrition"]] as [Screen, string, string, string][]).map(([sc, emoji, label, sub]) => (
+                <button key={sc} style={s.quickTile} onClick={() => setScreen(sc)}>
+                  <div style={s.quickEmoji}>{emoji}</div>
+                  <div style={s.quickLabel}>{label}</div>
+                  <div style={s.quickSub}>{sub}</div>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -475,19 +423,6 @@ export default function App() {
               <div style={s.pageTitle}>Recipes</div>
               <button style={s.newRecipeBtn} onClick={openNewRecipe}>+ New</button>
             </div>
-
-            {/* Paste importer */}
-            <div style={s.importCard}>
-              <div style={s.importTitle}>📋 Paste from Google Docs</div>
-              <textarea
-                style={s.importTextarea}
-                value={recipePasteText}
-                onChange={(e) => setRecipePasteText(e.target.value)}
-                placeholder={"Paste recipe here. Format it like:\n\nGreek Yogurt Parfait\n\nIngredients\nYogurt\nBerries\nGranola\n\nInstructions\nLayer ingredients."}
-              />
-              <button style={s.importBtn} onClick={importRecipeFromText}>Import Recipe</button>
-            </div>
-
             <input style={s.searchBar} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="🔍  Search recipes or tags…" />
             <div style={s.chipRow}>
               {categories.map((cat) => (
@@ -532,7 +467,7 @@ export default function App() {
                         {recipe.ingredients.length > 0 && (
                           <div style={s.expandSection}>
                             <div style={s.expandTitle}>Ingredients</div>
-                            {recipe.ingredients.map((ing, i) => <div key={i} style={s.expandRow}><span style={s.expandDot}>·</span><span>{ing.amount} {ing.item}</span></div>)}
+                            {recipe.ingredients.map((ing) => <div key={ing.item} style={s.expandRow}><span style={s.expandDot}>·</span><span>{ing.amount} {ing.item}</span></div>)}
                           </div>
                         )}
                         {recipe.instructions.length > 0 && (
@@ -542,7 +477,7 @@ export default function App() {
                           </div>
                         )}
                         {recipe.tags.length > 0 && <div style={s.tagRow}>{recipe.tags.map((tag) => <span key={tag} style={s.tag}>{tag}</span>)}</div>}
-                        <button style={{ ...s.addBtn, background: isAdded ? "#7c8a64" : "#7c8a6422", color: isAdded ? "#fff8ea" : "#4d5a3d", border: isAdded ? "none" : "1.5px solid #7c8a6466" }} onClick={() => assignRecipe(recipe.id)}>
+                        <button style={{ ...s.addBtn, background: isAdded ? "#a8e6cf" : "#a8e6cf22", color: isAdded ? "#0d1a12" : "#a8e6cf" }} onClick={() => assignRecipe(recipe.id)}>
                           {isAdded ? "✓ Added!" : `+ Add to ${selectedDay} ${capitalize(selectedSlot)}`}
                         </button>
                         <div style={s.recipeActions}>
@@ -607,57 +542,47 @@ export default function App() {
         {screen === "budget" && (
           <div style={s.screen}>
             <div style={s.pageHeader}><div style={s.pageTitle}>Budget & Groceries</div></div>
+
             <div style={s.budgetCard}>
               <div style={s.budgetCardRow}>
                 <div>
-                  <div style={s.budgetSectionTitle}>Weekly</div>
                   <div style={s.budgetBig}>{currency(editableTotal)}</div>
-                  <div style={s.budgetSub}>{budgetRemaining >= 0 ? `${currency(budgetRemaining)} left` : `${currency(Math.abs(budgetRemaining))} over`}</div>
+                  <div style={s.budgetSub}>of {currency(budgetTarget)} target</div>
                 </div>
-                <div style={s.budgetDivider} />
-                <div>
-                  <div style={s.budgetSectionTitle}>Monthly (est.)</div>
-                  <div style={s.budgetBigMonthly}>{currency(Number((editableTotal * 4.33).toFixed(2)))}</div>
-                  <div style={s.budgetSub}>{currency(Number((budgetTarget * 4.33).toFixed(2)))} target</div>
+                <div style={{ ...s.budgetPill, background: budgetRemaining >= 0 ? "#a8e6cf22" : "#ff6b6b22", color: budgetRemaining >= 0 ? "#a8e6cf" : "#ff6b6b", border: `1px solid ${budgetRemaining >= 0 ? "#a8e6cf44" : "#ff6b6b44"}` }}>
+                  {budgetRemaining >= 0 ? `${currency(budgetRemaining)} left` : `${currency(Math.abs(budgetRemaining))} over`}
                 </div>
               </div>
               <div style={s.budgetTrack}>
-                <div style={{ ...s.budgetFill, width: `${budgetPercent}%`, background: budgetRemaining >= 0 ? "#7c8a64" : "#c97b5a" }} />
+                <div style={{ ...s.budgetFill, width: `${budgetPercent}%`, background: budgetRemaining >= 0 ? "#a8e6cf" : "#ff6b6b" }} />
               </div>
             </div>
-            <div style={s.sectionLabel}>Weekly Budget Target</div>
+
+            <div style={s.sectionLabel}>Budget Target</div>
             <div style={s.budgetTargetRow}>
               <span style={s.budgetTargetLabel}>$</span>
               <input type="number" style={s.budgetTargetInput} value={budgetTarget} onChange={(e) => setBudgetTarget(Number(e.target.value) || 0)} />
               <button style={s.resetBtn} onClick={resetBudget}>↺ Reset</button>
             </div>
-            <div style={s.sectionLabel}>Grocery List · enter your actual prices</div>
+
+            <div style={s.sectionLabel}>Grocery List</div>
             <button style={s.addGroceryBtn} onClick={addGroceryItem}>+ Add Item</button>
             <div style={s.groceryList}>
               {editableGroceries.map((item, i) => (
                 <div key={`${item.name}-${i}`} style={s.groceryEditRow}>
                   <div style={s.groceryEditLeft}>
                     <input style={s.groceryEditInput} value={item.name} onChange={(e) => updateGrocery(i, "name", e.target.value)} placeholder="Item name" />
-                    <input style={{ ...s.groceryEditInput, fontSize: 11, color: "#8b7d6b", fontWeight: 400 }} value={item.category} onChange={(e) => updateGrocery(i, "category", e.target.value)} placeholder="Category" />
+                    <input style={{ ...s.groceryEditInput, fontSize: 11, color: "#6b7280" }} value={item.category} onChange={(e) => updateGrocery(i, "category", e.target.value)} placeholder="Category" />
                   </div>
                   <div style={s.groceryEditRight}>
-                    <div style={s.groceryPriceWrap}>
-                      <span style={s.groceryDollar}>$</span>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        style={s.groceryCostInput}
-                        value={item.priceText !== undefined ? item.priceText : (item.estimatedCost === 0 ? "" : String(item.estimatedCost))}
-                        onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)}
-                        onBlur={() => commitPrice(i)}
-                        placeholder="0.00"
-                      />
-                    </div>
+                    <span style={s.groceryUses}>{item.uses}x</span>
+                    <input type="number" style={s.groceryCostInput} value={item.estimatedCost} onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)} />
                     <button style={s.groceryDeleteBtn} onClick={() => deleteGroceryItem(i)}>✕</button>
                   </div>
                 </div>
               ))}
             </div>
+
             <div style={s.sectionLabel}>Portion Rules</div>
             <div style={s.rulesCard}>
               {["Greek yogurt: 3/4 cup max", "Rice: 1 cup cooked max", "Chicken: 4 oz standard", "Almond butter: 1 tbsp", "No tomatoes · Low spice"].map((rule) => (
@@ -671,6 +596,8 @@ export default function App() {
         {screen === "insights" && (
           <div style={s.screen}>
             <div style={s.pageHeader}><div style={s.pageTitle}>Insights</div></div>
+
+            {/* Profile */}
             <div style={s.sectionLabel}>Your Profile</div>
             <div style={s.profileCard}>
               {([["age", "Age", "number", ""], ["height", "Height", "text", "e.g. 5'4\""], ["weight", "Weight (lbs)", "number", ""]] as [keyof typeof profile, string, string, string][]).map(([field, label, type, ph]) => (
@@ -688,6 +615,8 @@ export default function App() {
                 </select>
               </div>
             </div>
+
+            {/* Macro Goals */}
             <div style={s.sectionLabel}>Macro Goals</div>
             <div style={s.macroGoalCard}>
               {(["calories", "protein", "carbs", "fat"] as const).map((key) => {
@@ -699,10 +628,10 @@ export default function App() {
                   <div key={key} style={s.macroGoalRow}>
                     <div style={s.macroGoalLabel}>{capitalize(key)}</div>
                     <div style={s.macroGoalBar}>
-                      <div style={{ ...s.macroGoalFill, width: `${pct}%`, background: ok ? "#7c8a64" : "#c9876a" }} />
+                      <div style={{ ...s.macroGoalFill, width: `${pct}%`, background: ok ? "#a8e6cf" : "#ffb347" }} />
                     </div>
                     <div style={s.macroGoalNums}>
-                      <span style={{ color: ok ? "#5a6b4a" : "#b06040", fontSize: 13 }}>{current}</span>
+                      <span style={{ color: ok ? "#a8e6cf" : "#ffb347" }}>{current}</span>
                       <span style={s.macroGoalSlash}>/</span>
                       <input type="number" style={s.macroGoalInput} value={goal} onChange={(e) => setMacroGoals((prev) => ({ ...prev, [key]: Number(e.target.value) || 0 }))} />
                     </div>
@@ -710,6 +639,8 @@ export default function App() {
                 );
               })}
             </div>
+
+            {/* Macro suggestions */}
             {macroSuggestions.length > 0 && (
               <>
                 <div style={s.sectionLabel}>Recipe Suggestions</div>
@@ -722,238 +653,212 @@ export default function App() {
             )}
             {macroSuggestions.length === 0 && (
               <div style={{ ...s.insightCard, marginBottom: 16 }}>
-                <div style={{ color: "#5a6b4a", fontWeight: 600, fontSize: 14 }}>✓ Your plan is close to all your macro goals!</div>
+                <div style={{ color: "#a8e6cf", fontWeight: 600, fontSize: 14 }}>✓ Your plan is close to all your macro goals!</div>
               </div>
             )}
+
+            {/* Nutrition gaps */}
             <div style={s.sectionLabel}>Nutrition Pattern Check</div>
             <div style={s.insightCard}>
               {nutritionGaps.length === 0 ? (
-                <div style={{ color: "#5a6b4a", fontWeight: 600, fontSize: 14 }}>✓ Your plan looks balanced.</div>
+                <div style={{ color: "#a8e6cf", fontWeight: 600, fontSize: 14 }}>✓ Your plan looks balanced across the categories this app can detect.</div>
               ) : (
                 nutritionGaps.map((gap) => <div key={gap} style={s.insightRow}><span style={s.insightDot}>⚠</span><span>{gap}</span></div>)
               )}
               {personalizedNotes.map((note) => <div key={note} style={s.insightRow}><span style={s.insightDot}>ℹ</span><span>{note}</span></div>)}
-              <div style={s.disclaimer}>Food-pattern check only, not medical advice. Speak with a doctor or dietitian about supplements.</div>
+              <div style={s.disclaimer}>This is a food-pattern check only, not medical advice. Speak with a doctor or dietitian about supplements.</div>
             </div>
-            <div style={s.sectionLabel}>Meals You Eat Most This Week</div>
+
+            {/* Monthly picks */}
+            <div style={s.sectionLabel}>Most Added This Session</div>
             <div style={s.insightCard}>
-              {(() => {
-                const mealCount: Record<string, number> = {};
-                Object.values(plan).forEach((day) => {
-                  Object.values(day).forEach((id) => { if (id) mealCount[id] = (mealCount[id] || 0) + 1; });
-                });
-                const sorted = Object.entries(mealCount)
-                  .map(([id, count]) => ({ recipe: recipes.find((r) => r.id === id), count }))
-                  .filter((x) => x.recipe)
-                  .sort((a, b) => b.count - a.count);
-                return sorted.length === 0 ? (
-                  <div style={{ color: "#8b7d6b", fontSize: 13, fontStyle: "italic" }}>Plan your meals to see which ones you eat most.</div>
-                ) : (
-                  <>
-                    {sorted.map(({ recipe, count }, i) => recipe && (
-                      <div key={recipe.id} style={s.foodFreqRow}>
-                        <span style={s.foodFreqRank}>{i + 1}</span>
-                        <div style={s.foodFreqBarWrap}>
-                          <div style={s.foodFreqLabel}>{recipe.name}</div>
-                          <div style={s.foodFreqTrack}>
-                            <div style={{ ...s.foodFreqFill, width: `${Math.round((count / sorted[0].count) * 100)}%` }} />
-                          </div>
-                        </div>
-                        <span style={s.foodFreqCount}>{count}x</span>
-                      </div>
-                    ))}
-                    <div style={s.disclaimer}>Based on your current weekly meal plan.</div>
-                  </>
-                );
-              })()}
+              {mostPicked.length === 0 ? (
+                <div style={{ color: "#6b7280", fontSize: 13 }}>Add recipes to your planner to start tracking.</div>
+              ) : (
+                mostPicked.map(({ recipe, count }) => recipe && (
+                  <div key={recipe.id} style={s.insightRow}>
+                    <span style={s.insightDot}>◆</span>
+                    <span><strong>{recipe.name}</strong> — added {count}x</span>
+                  </div>
+                ))
+              )}
+              {mostPicked.length > 0 && (
+                <button style={{ ...s.resetBtn, marginTop: 12 }} onClick={() => setMonthlyPicks({})}>↺ Reset tracking</button>
+              )}
             </div>
-            {mostPicked.length > 0 && (
-              <>
-                <div style={s.sectionLabel}>Most Added This Session</div>
-                <div style={s.insightCard}>
-                  {mostPicked.map(({ recipe, count }) => recipe && (
-                    <div key={recipe.id} style={s.insightRow}>
-                      <span style={s.insightDot}>◆</span>
-                      <span><strong>{recipe.name}</strong> — added {count}×</span>
-                    </div>
-                  ))}
-                  <button style={{ ...s.resetBtn, marginTop: 8 }} onClick={() => setMonthlyPicks({})}>↺ Reset</button>
-                </div>
-              </>
-            )}
+
             <div style={{ height: 16 }} />
           </div>
         )}
       </div>
+
+      <nav style={s.bottomNav}>
+        {NAV.map((item) => (
+          <button key={item.id} style={s.navBtn} onClick={() => setScreen(item.id as Screen)}>
+            <span style={{ ...s.navIcon, ...(screen === item.id ? { color: "#a8e6cf" } : {}) }}>{item.icon}</span>
+            <span style={{ ...s.navLabel, ...(screen === item.id ? { color: "#a8e6cf" } : {}) }}>{item.label}</span>
+            {screen === item.id && <div style={s.navDot} />}
+          </button>
+        ))}
+      </nav>
     </div>
   );
 }
 
 const s: Record<string, React.CSSProperties> = {
-  shell: { maxWidth: 430, margin: "0 auto", minHeight: "100vh", background: "#f4efe3", backgroundImage: "radial-gradient(rgba(80,70,55,0.07) 1px, transparent 1px)", backgroundSize: "18px 18px", color: "#2f2a24", display: "flex", flexDirection: "column", fontFamily: "Georgia, 'Times New Roman', serif", position: "relative", overflow: "hidden" },
-  statusBar: { height: 4, background: "linear-gradient(90deg, #7c8a64, #c9a87c, #c97b5a, #7c8a64)", flexShrink: 0 },
-  screenWrap: { flex: 1, overflowY: "auto", overflowX: "hidden", paddingBottom: 32 },
+  shell: { maxWidth: 430, margin: "0 auto", minHeight: "100vh", background: "#0d0d1a", color: "#f0f0f8", display: "flex", flexDirection: "column", fontFamily: "'DM Sans','SF Pro Display',-apple-system,sans-serif", position: "relative", overflow: "hidden" },
+  statusBar: { height: 3, background: "linear-gradient(90deg,#a8e6cf,#88d8b0,#a8e6cf)", flexShrink: 0 },
+  screenWrap: { flex: 1, overflowY: "auto", overflowX: "hidden", paddingBottom: 80 },
   screen: { padding: "20px 16px 0" },
-  topNav: { display: "flex", borderBottom: "1.5px solid #c9b99a", background: "#fff8eaf0", backdropFilter: "blur(8px)", flexShrink: 0, overflowX: "auto" },
-  topNavBtn: { flex: 1, padding: "10px 4px", background: "transparent", border: "none", fontSize: 11, fontWeight: 700, color: "#8b7d6b", cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "Georgia, serif", whiteSpace: "nowrap" },
-  topNavBtnActive: { color: "#4d5a3d", borderBottom: "2.5px solid #7c8a64" },
   homeHeader: { marginBottom: 24, paddingTop: 8 },
-  homeEyebrow: { fontSize: 11, color: "#7c8a64", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 },
-  homeLogo: { fontSize: 30, fontWeight: 700, letterSpacing: "0.01em", lineHeight: 1, color: "#2f2a24" },
-  homeTagline: { fontSize: 13, color: "#8b7d6b", marginTop: 5, fontStyle: "italic" },
-  budgetRingCard: { background: "#fff8ea", borderRadius: 20, padding: 20, display: "flex", alignItems: "center", gap: 20, marginBottom: 24, border: "1.5px solid #c9b99a", boxShadow: "4px 4px 0 rgba(79,70,55,0.10)" },
+  homeEyebrow: { fontSize: 12, color: "#a8e6cf", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 4 },
+  homeLogo: { fontSize: 32, fontWeight: 800, letterSpacing: "-0.02em", lineHeight: 1 },
+  homeTagline: { fontSize: 14, color: "#6b7280", marginTop: 4 },
+  budgetRingCard: { background: "#161628", borderRadius: 20, padding: 20, display: "flex", alignItems: "center", gap: 20, marginBottom: 24, border: "1px solid #ffffff0d" },
   ringOuter: { flexShrink: 0 },
   ringInfo: {},
-  ringLabel: { fontSize: 11, color: "#8b7d6b", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 6 },
-  ringAmount: { fontSize: 20, fontWeight: 700, color: "#7c8a64" },
-  ringMeta: { fontSize: 12, color: "#8b7d6b", marginTop: 4 },
-  sectionLabel: { fontSize: 10, fontWeight: 700, color: "#7c8a64", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: 10, marginTop: 4 },
+  ringLabel: { fontSize: 12, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 },
+  ringAmount: { fontSize: 22, fontWeight: 700, color: "#a8e6cf" },
+  ringMeta: { fontSize: 13, color: "#6b7280", marginTop: 4 },
+  sectionLabel: { fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 10, marginTop: 4 },
   macroStrip: { display: "flex", gap: 8, marginBottom: 24 },
-  macroChip: { flex: 1, background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "10px 6px", textAlign: "center", boxShadow: "2px 2px 0 rgba(79,70,55,0.08)" },
+  macroChip: { flex: 1, background: "#161628", border: "1px solid #ffffff0d", borderRadius: 14, padding: "10px 6px", textAlign: "center" },
   macroVal: { fontSize: 16, fontWeight: 700 },
-  macroLbl: { fontSize: 11, color: "#8b7d6b", marginTop: 2 },
-  macroGoalLbl: { fontSize: 10, color: "#c9b99a", marginTop: 2 },
+  macroLbl: { fontSize: 11, color: "#6b7280", marginTop: 2 },
+  macroGoalLbl: { fontSize: 10, color: "#444466", marginTop: 2 },
   todayList: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 },
-  todayRow: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "center", gap: 12, boxShadow: "2px 2px 0 rgba(79,70,55,0.08)" },
-  todaySlotBadge: { background: "#7c8a6422", color: "#5a6b4a", borderRadius: 8, padding: "3px 8px", fontSize: 11, fontWeight: 700, flexShrink: 0, border: "1px solid #7c8a6444" },
+  todayRow: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "center", gap: 12 },
+  todaySlotBadge: { background: "#a8e6cf22", color: "#a8e6cf", borderRadius: 8, padding: "3px 8px", fontSize: 11, fontWeight: 600, flexShrink: 0 },
   todayRowInfo: { flex: 1 },
-  todayRowName: { fontSize: 14, fontWeight: 700, color: "#2f2a24" },
-  todayRowMeta: { fontSize: 12, color: "#8b7d6b", marginTop: 2, fontStyle: "italic" },
-  emptyState: { textAlign: "center", color: "#8b7d6b", padding: "24px 0", fontSize: 13, marginBottom: 24, fontStyle: "italic" },
+  todayRowName: { fontSize: 14, fontWeight: 600 },
+  todayRowMeta: { fontSize: 12, color: "#6b7280", marginTop: 2 },
+  emptyState: { textAlign: "center", color: "#6b7280", padding: "24px 0", fontSize: 14, marginBottom: 24 },
+  quickGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 16 },
+  quickTile: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 14, padding: "14px 6px", textAlign: "center", cursor: "pointer", color: "#f0f0f8" },
+  quickEmoji: { fontSize: 18, marginBottom: 5 },
+  quickLabel: { fontSize: 11, fontWeight: 700 },
+  quickSub: { fontSize: 10, color: "#6b7280", marginTop: 2 },
   pageHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, paddingTop: 8 },
-  pageTitle: { fontSize: 24, fontWeight: 700, letterSpacing: "0.01em", color: "#2f2a24" },
-  newRecipeBtn: { background: "#7c8a64", border: "1.5px solid #4d5a3d", borderRadius: 20, padding: "8px 14px", color: "#fff8ea", fontSize: 12, fontWeight: 700, cursor: "pointer" },
-  importCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: 14, marginBottom: 16, boxShadow: "2px 2px 0 rgba(79,70,55,0.08)" },
-  importTitle: { fontSize: 13, fontWeight: 700, color: "#2f2a24", marginBottom: 10 },
-  importTextarea: { width: "100%", minHeight: 100, padding: "10px 12px", borderRadius: 10, border: "1.5px solid #c9b99a", background: "#fffdf6", color: "#2f2a24", fontSize: 13, fontFamily: "Georgia, serif", boxSizing: "border-box", resize: "vertical" },
-  importBtn: { marginTop: 10, padding: "9px 16px", borderRadius: 20, border: "none", background: "#7c8a64", color: "#fff8ea", fontWeight: 700, cursor: "pointer", fontSize: 13 },
-  searchBar: { width: "100%", background: "#fffdf6", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "12px 16px", color: "#2f2a24", fontSize: 14, marginBottom: 12, boxSizing: "border-box", fontFamily: "Georgia, serif" },
+  pageTitle: { fontSize: 26, fontWeight: 800, letterSpacing: "-0.02em" },
+  newRecipeBtn: { background: "#a8e6cf22", border: "1px solid #a8e6cf44", borderRadius: 10, padding: "8px 14px", color: "#a8e6cf", fontSize: 13, fontWeight: 700, cursor: "pointer" },
+  searchBar: { width: "100%", background: "#161628", border: "1px solid #ffffff0d", borderRadius: 14, padding: "13px 16px", color: "#f0f0f8", fontSize: 14, marginBottom: 12, boxSizing: "border-box" },
   chipRow: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 },
-  chip: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 99, padding: "5px 13px", fontSize: 12, color: "#8b7d6b", cursor: "pointer" },
-  chipActive: { background: "#7c8a6422", border: "1.5px solid #7c8a64", color: "#4d5a3d" },
-  chipGreen: { background: "#7c8a6422", border: "1.5px solid #7c8a64", color: "#4d5a3d" },
-  planStrip: { display: "flex", alignItems: "center", gap: 8, background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 12, padding: "10px 14px", marginBottom: 14, flexWrap: "wrap", boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
-  planStripLabel: { fontSize: 12, color: "#8b7d6b", flexShrink: 0, fontStyle: "italic" },
-  miniSelect: { background: "#fffdf6", border: "1px solid #c9b99a", borderRadius: 8, padding: "5px 10px", color: "#4d5a3d", fontSize: 12, cursor: "pointer" },
-  recipeList: { display: "flex", flexDirection: "column", gap: 10 },
-  recipeCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 18, overflow: "hidden", boxShadow: "3px 3px 0 rgba(79,70,55,0.10)" },
-  recipeCardHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", width: "100%", background: "transparent", border: "none", color: "#2f2a24", cursor: "pointer", textAlign: "left", gap: 12 },
+  chip: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 99, padding: "6px 14px", fontSize: 13, color: "#9ca3af", cursor: "pointer" },
+  chipActive: { background: "#a8e6cf22", border: "1px solid #a8e6cf66", color: "#a8e6cf" },
+  chipGreen: { background: "#a8e6cf22", border: "1px solid #a8e6cf66", color: "#a8e6cf" },
+  planStrip: { display: "flex", alignItems: "center", gap: 8, background: "#161628", border: "1px solid #ffffff0d", borderRadius: 12, padding: "10px 14px", marginBottom: 14, flexWrap: "wrap" },
+  planStripLabel: { fontSize: 12, color: "#6b7280", flexShrink: 0 },
+  miniSelect: { background: "#0d0d1a", border: "1px solid #ffffff15", borderRadius: 8, padding: "5px 10px", color: "#a8e6cf", fontSize: 13, cursor: "pointer" },
+  recipeList: { display: "flex", flexDirection: "column", gap: 8 },
+  recipeCard: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" },
+  recipeCardHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", width: "100%", background: "transparent", border: "none", color: "#f0f0f8", cursor: "pointer", textAlign: "left", gap: 12 },
   recipeCardLeft: { flex: 1 },
-  recipeCardName: { fontSize: 15, fontWeight: 700, color: "#2f2a24" },
-  recipeCardMeta: { fontSize: 12, color: "#8b7d6b", marginTop: 3, fontStyle: "italic" },
-  recipeChevron: { fontSize: 10, color: "#c9b99a", flexShrink: 0 },
-  recipeExpanded: { padding: "0 16px 16px", borderTop: "1.5px dashed #e0d4c0" },
+  recipeCardName: { fontSize: 15, fontWeight: 600 },
+  recipeCardMeta: { fontSize: 12, color: "#6b7280", marginTop: 3 },
+  recipeChevron: { fontSize: 10, color: "#6b7280", flexShrink: 0 },
+  recipeExpanded: { padding: "0 16px 16px", borderTop: "1px solid #ffffff0a" },
   miniMacroRow: { display: "flex", gap: 6, paddingTop: 14, marginBottom: 14 },
-  miniMacroBox: { flex: 1, background: "#f4efe3", border: "1px solid #ddd0ba", borderRadius: 10, padding: "8px 6px", textAlign: "center" },
-  miniMacroVal: { fontSize: 14, fontWeight: 700, color: "#2f2a24" },
-  miniMacroLbl: { fontSize: 10, color: "#8b7d6b", marginTop: 2 },
+  miniMacroBox: { flex: 1, background: "#0d0d1a", borderRadius: 10, padding: "8px 6px", textAlign: "center" },
+  miniMacroVal: { fontSize: 14, fontWeight: 700 },
+  miniMacroLbl: { fontSize: 10, color: "#6b7280", marginTop: 2 },
   expandSection: { marginBottom: 12 },
-  expandTitle: { fontSize: 10, fontWeight: 700, color: "#7c8a64", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 8 },
-  expandRow: { display: "flex", gap: 8, fontSize: 13, color: "#3d3530", marginBottom: 5, lineHeight: 1.6 },
-  expandDot: { color: "#c97b5a", flexShrink: 0, marginTop: 1 },
-  expandNum: { color: "#c97b5a", fontWeight: 700, flexShrink: 0, minWidth: 16 },
+  expandTitle: { fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 8 },
+  expandRow: { display: "flex", gap: 8, fontSize: 13, color: "#d1d5db", marginBottom: 5, lineHeight: 1.5 },
+  expandDot: { color: "#a8e6cf", flexShrink: 0, marginTop: 1 },
+  expandNum: { color: "#a8e6cf", fontWeight: 700, flexShrink: 0, minWidth: 16 },
   tagRow: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 14 },
-  tag: { background: "#f4efe3", border: "1px solid #ddd0ba", borderRadius: 99, padding: "3px 10px", fontSize: 11, color: "#8b7d6b" },
-  addBtn: { width: "100%", borderRadius: 12, padding: "12px", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 10 },
+  tag: { background: "#ffffff08", borderRadius: 99, padding: "3px 10px", fontSize: 11, color: "#9ca3af" },
+  addBtn: { width: "100%", border: "none", borderRadius: 12, padding: "12px", fontSize: 14, fontWeight: 700, cursor: "pointer", marginBottom: 10 },
   recipeActions: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" },
-  editBtn: { background: "#f4efe3", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "8px 14px", color: "#3d3530", fontSize: 12, cursor: "pointer" },
-  deleteBtn: { background: "#f5ddd0", border: "1.5px solid #c9876a", borderRadius: 10, padding: "8px 14px", color: "#7b3f2f", fontSize: 12, cursor: "pointer" },
+  editBtn: { background: "#ffffff0a", border: "1px solid #ffffff15", borderRadius: 10, padding: "8px 14px", color: "#d1d5db", fontSize: 13, cursor: "pointer" },
+  deleteBtn: { background: "#ff6b6b11", border: "1px solid #ff6b6b33", borderRadius: 10, padding: "8px 14px", color: "#ff6b6b", fontSize: 13, cursor: "pointer" },
   confirmRow: { display: "flex", gap: 6, alignItems: "center" },
-  confirmText: { fontSize: 12, color: "#c97b5a" },
-  confirmYes: { background: "#c97b5a", border: "none", borderRadius: 8, padding: "6px 12px", color: "#fff8ea", fontSize: 12, fontWeight: 700, cursor: "pointer" },
-  confirmNo: { background: "#f4efe3", border: "none", borderRadius: 8, padding: "6px 12px", color: "#8b7d6b", fontSize: 12, cursor: "pointer" },
-  recipeCount: { textAlign: "center", fontSize: 11, color: "#c9b99a", padding: "12px 0 4px", fontStyle: "italic" },
+  confirmText: { fontSize: 12, color: "#ff6b6b" },
+  confirmYes: { background: "#ff6b6b", border: "none", borderRadius: 8, padding: "6px 12px", color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer" },
+  confirmNo: { background: "#ffffff0a", border: "none", borderRadius: 8, padding: "6px 12px", color: "#9ca3af", fontSize: 12, cursor: "pointer" },
+  recipeCount: { textAlign: "center", fontSize: 12, color: "#444466", padding: "12px 0 4px" },
   dayScroll: { display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap", paddingTop: 8 },
-  dayChip: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 12, padding: "8px 14px", fontSize: 13, fontWeight: 600, color: "#8b7d6b", cursor: "pointer" },
-  dayChipActive: { background: "#7c8a64", color: "#fff8ea", border: "1.5px solid #4d5a3d", boxShadow: "2px 2px 0 rgba(79,70,55,0.15)" },
-  dayMacroBar: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 12, padding: "10px 14px", display: "flex", gap: 14, marginBottom: 16, flexWrap: "wrap", boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
-  dayMacroItem: { fontSize: 13, color: "#3d3530" },
+  dayChip: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 12, padding: "8px 14px", fontSize: 13, fontWeight: 600, color: "#9ca3af", cursor: "pointer" },
+  dayChipActive: { background: "#a8e6cf", color: "#0d1a12", border: "1px solid #a8e6cf" },
+  dayMacroBar: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 12, padding: "10px 14px", display: "flex", gap: 14, marginBottom: 16, flexWrap: "wrap" },
+  dayMacroItem: { fontSize: 13, color: "#d1d5db" },
   slotTabRow: { display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" },
-  slotTab: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 99, padding: "6px 14px", fontSize: 12, color: "#8b7d6b", cursor: "pointer" },
-  slotTabActive: { background: "#f4efe3", color: "#2f2a24", border: "1.5px solid #8b7d6b", fontWeight: 700 },
+  slotTab: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 99, padding: "6px 14px", fontSize: 12, color: "#9ca3af", cursor: "pointer" },
+  slotTabActive: { background: "#ffffff15", color: "#f0f0f8", border: "1px solid #ffffff22" },
   slotList: { display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 },
-  slotCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: "14px 16px", boxShadow: "2px 2px 0 rgba(79,70,55,0.08)" },
-  slotCardActive: { border: "1.5px solid #7c8a64", boxShadow: "3px 3px 0 rgba(79,70,55,0.12)" },
+  slotCard: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 16, padding: "14px 16px" },
+  slotCardActive: { border: "1px solid #a8e6cf44" },
   slotCardTop: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
-  slotBadge: { fontSize: 10, fontWeight: 700, color: "#7c8a64", textTransform: "uppercase", letterSpacing: "0.1em" },
-  clearBtn: { background: "transparent", border: "none", color: "#c9b99a", fontSize: 14, cursor: "pointer", padding: "2px 6px" },
-  slotCardName: { fontSize: 15, fontWeight: 700, marginBottom: 4, color: "#2f2a24" },
-  slotCardMeta: { fontSize: 12, color: "#8b7d6b", fontStyle: "italic" },
-  goRecipesBtn: { width: "100%", background: "#7c8a64", border: "1.5px solid #4d5a3d", borderRadius: 14, padding: "14px", color: "#fff8ea", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 16, boxShadow: "3px 3px 0 rgba(79,70,55,0.15)" },
-  budgetCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 20, padding: 20, marginBottom: 20, boxShadow: "4px 4px 0 rgba(79,70,55,0.10)" },
+  slotBadge: { fontSize: 11, fontWeight: 700, color: "#a8e6cf", textTransform: "uppercase", letterSpacing: "0.08em" },
+  clearBtn: { background: "transparent", border: "none", color: "#6b7280", fontSize: 14, cursor: "pointer", padding: "2px 6px" },
+  slotCardName: { fontSize: 15, fontWeight: 600, marginBottom: 4 },
+  slotCardMeta: { fontSize: 12, color: "#6b7280" },
+  goRecipesBtn: { width: "100%", background: "#a8e6cf22", border: "1px solid #a8e6cf44", borderRadius: 14, padding: "14px", color: "#a8e6cf", fontSize: 14, fontWeight: 700, cursor: "pointer", marginBottom: 16 },
+  budgetCard: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 20, padding: 20, marginBottom: 20 },
   budgetCardRow: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
-  budgetBig: { fontSize: 34, fontWeight: 700, letterSpacing: "-0.01em", color: "#2f2a24" },
-  budgetSub: { fontSize: 12, color: "#8b7d6b", marginTop: 4, fontStyle: "italic" },
-  budgetSectionTitle: { fontSize: 10, fontWeight: 700, color: "#8b7d6b", textTransform: "uppercase" as const, letterSpacing: "0.12em", marginBottom: 4 },
-  budgetBigMonthly: { fontSize: 24, fontWeight: 700, color: "#2f2a24" },
-  budgetDivider: { width: 1, background: "#e0d4c0", alignSelf: "stretch", margin: "0 8px" },
-  budgetTrack: { height: 8, background: "#f4efe3", borderRadius: 99, overflow: "hidden", border: "1px solid #ddd0ba" },
+  budgetBig: { fontSize: 36, fontWeight: 800, letterSpacing: "-0.02em" },
+  budgetSub: { fontSize: 13, color: "#6b7280", marginTop: 4 },
+  budgetPill: { borderRadius: 99, padding: "6px 14px", fontSize: 13, fontWeight: 700, flexShrink: 0 },
+  budgetTrack: { height: 8, background: "#0d0d1a", borderRadius: 99, overflow: "hidden" },
   budgetFill: { height: "100%", borderRadius: 99, transition: "width 0.5s ease" },
-  budgetTargetRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 20, background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "12px 16px" },
-  budgetTargetLabel: { fontSize: 20, fontWeight: 700, color: "#7c8a64" },
-  budgetTargetInput: { flex: 1, background: "transparent", border: "none", color: "#2f2a24", fontSize: 20, fontWeight: 700, outline: "none" },
-  resetBtn: { background: "#f4efe3", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "7px 12px", color: "#8b7d6b", fontSize: 12, cursor: "pointer" },
-  addGroceryBtn: { background: "#7c8a64", border: "1.5px solid #4d5a3d", borderRadius: 12, padding: "10px 16px", color: "#fff8ea", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 12, width: "100%", boxShadow: "2px 2px 0 rgba(79,70,55,0.12)" },
+  budgetTargetRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 20, background: "#161628", border: "1px solid #ffffff0d", borderRadius: 14, padding: "12px 16px" },
+  budgetTargetLabel: { fontSize: 20, fontWeight: 700, color: "#a8e6cf" },
+  budgetTargetInput: { flex: 1, background: "transparent", border: "none", color: "#f0f0f8", fontSize: 20, fontWeight: 700, outline: "none" },
+  resetBtn: { background: "#ffffff0a", border: "1px solid #ffffff15", borderRadius: 10, padding: "7px 12px", color: "#9ca3af", fontSize: 12, cursor: "pointer" },
+  addGroceryBtn: { background: "#a8e6cf22", border: "1px solid #a8e6cf44", borderRadius: 12, padding: "10px 16px", color: "#a8e6cf", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 12, width: "100%" },
   groceryList: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 },
-  groceryEditRow: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "14px 14px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
+  groceryEditRow: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 14, padding: "10px 12px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 },
   groceryEditLeft: { flex: 1, display: "flex", flexDirection: "column", gap: 4 },
-  groceryEditInput: { background: "transparent", border: "none", color: "#2f2a24", fontSize: 14, fontWeight: 700, outline: "none", width: "100%" },
+  groceryEditInput: { background: "transparent", border: "none", color: "#f0f0f8", fontSize: 14, fontWeight: 600, outline: "none", width: "100%" },
   groceryEditRight: { display: "flex", alignItems: "center", gap: 8, flexShrink: 0 },
-  groceryUses: { fontSize: 11, color: "#c9b99a" },
-  groceryPriceWrap: { display: "flex", alignItems: "center", gap: 4, background: "#fff8ea", border: "2px solid #7c8a64", borderRadius: 12, padding: "10px 12px", minWidth: 90 },
-  groceryDollar: { fontSize: 16, fontWeight: 700, color: "#7c8a64" },
-  groceryCostInput: { width: 64, background: "transparent", border: "none", color: "#4d5a3d", fontSize: 18, fontWeight: 700, textAlign: "right" as const, outline: "none" },
-  groceryDeleteBtn: { background: "transparent", border: "none", color: "#c9b99a", fontSize: 14, cursor: "pointer" },
-  rulesCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, marginBottom: 24, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
-  ruleRow: { display: "flex", gap: 10, fontSize: 13, color: "#3d3530", lineHeight: 1.6 },
-  ruleDot: { color: "#c97b5a", flexShrink: 0, fontSize: 10, marginTop: 3 },
-  profileCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: "14px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
+  groceryUses: { fontSize: 11, color: "#6b7280" },
+  groceryCostInput: { width: 60, background: "#0d0d1a", border: "1px solid #ffffff15", borderRadius: 8, padding: "4px 8px", color: "#a8e6cf", fontSize: 13, fontWeight: 700, textAlign: "right" },
+  groceryDeleteBtn: { background: "transparent", border: "none", color: "#6b7280", fontSize: 14, cursor: "pointer" },
+  rulesCard: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, marginBottom: 24 },
+  ruleRow: { display: "flex", gap: 10, fontSize: 13, color: "#d1d5db", lineHeight: 1.5 },
+  ruleDot: { color: "#a8e6cf", flexShrink: 0, fontSize: 10, marginTop: 3 },
+  // Insights
+  profileCard: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 16, padding: "14px 16px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 },
   profileField: {},
-  profileFieldLabel: { fontSize: 10, color: "#8b7d6b", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.1em" },
-  profileInput: { width: "100%", background: "#fffdf6", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "9px 10px", color: "#2f2a24", fontSize: 13, boxSizing: "border-box" },
-  macroGoalCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 14, marginBottom: 20, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
+  profileFieldLabel: { fontSize: 11, color: "#6b7280", marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.08em" },
+  profileInput: { width: "100%", background: "#0d0d1a", border: "1px solid #ffffff15", borderRadius: 10, padding: "9px 10px", color: "#f0f0f8", fontSize: 14, boxSizing: "border-box" },
+  macroGoalCard: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 },
   macroGoalRow: { display: "flex", alignItems: "center", gap: 10 },
-  macroGoalLabel: { fontSize: 12, fontWeight: 700, color: "#8b7d6b", width: 52, flexShrink: 0 },
-  macroGoalBar: { flex: 1, height: 6, background: "#f4efe3", borderRadius: 99, overflow: "hidden", border: "1px solid #ddd0ba" },
+  macroGoalLabel: { fontSize: 12, fontWeight: 600, color: "#9ca3af", width: 52, flexShrink: 0 },
+  macroGoalBar: { flex: 1, height: 6, background: "#0d0d1a", borderRadius: 99, overflow: "hidden" },
   macroGoalFill: { height: "100%", borderRadius: 99, transition: "width 0.4s ease" },
   macroGoalNums: { display: "flex", alignItems: "center", gap: 4, flexShrink: 0 },
-  macroGoalSlash: { color: "#c9b99a", fontSize: 12 },
-  macroGoalInput: { width: 52, background: "#f4efe3", border: "1.5px solid #c9b99a", borderRadius: 8, padding: "4px 6px", color: "#2f2a24", fontSize: 13, textAlign: "right" },
-  insightCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, marginBottom: 20, boxShadow: "2px 2px 0 rgba(79,70,55,0.07)" },
-  insightRow: { display: "flex", gap: 10, fontSize: 13, color: "#3d3530", lineHeight: 1.6 },
-  insightDot: { color: "#7c8a64", flexShrink: 0, marginTop: 1, fontSize: 11 },
-  disclaimer: { fontSize: 11, color: "#c9b99a", marginTop: 6, lineHeight: 1.5, fontStyle: "italic" },
-  foodFreqRow: { display: "flex", alignItems: "center", gap: 10, marginBottom: 8 },
-  foodFreqRank: { fontSize: 11, fontWeight: 700, color: "#c9b99a", width: 16, flexShrink: 0, textAlign: "right" as const },
-  foodFreqBarWrap: { flex: 1 },
-  foodFreqLabel: { fontSize: 13, fontWeight: 600, color: "#2f2a24", marginBottom: 4 },
-  foodFreqTrack: { height: 5, background: "#f4efe3", borderRadius: 99, overflow: "hidden", border: "1px solid #e0d4c0" },
-  foodFreqFill: { height: "100%", background: "#7c8a64", borderRadius: 99, transition: "width 0.4s ease" },
-  foodFreqCount: { fontSize: 12, fontWeight: 700, color: "#7c8a64", flexShrink: 0, width: 24, textAlign: "right" as const },
+  macroGoalSlash: { color: "#444466", fontSize: 12 },
+  macroGoalInput: { width: 52, background: "#0d0d1a", border: "1px solid #ffffff15", borderRadius: 8, padding: "4px 6px", color: "#f0f0f8", fontSize: 13, textAlign: "right" },
+  insightCard: { background: "#161628", border: "1px solid #ffffff0d", borderRadius: 16, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 },
+  insightRow: { display: "flex", gap: 10, fontSize: 13, color: "#d1d5db", lineHeight: 1.55 },
+  insightDot: { color: "#a8e6cf", flexShrink: 0, marginTop: 1, fontSize: 11 },
+  disclaimer: { fontSize: 11, color: "#444466", marginTop: 6, lineHeight: 1.5 },
+  // Editor
   editorHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, paddingTop: 8 },
-  editorTitle: { fontSize: 18, fontWeight: 700, color: "#2f2a24" },
-  backBtn: { background: "transparent", border: "none", color: "#8b7d6b", fontSize: 14, cursor: "pointer", padding: "6px 0" },
-  saveBtn: { background: "#7c8a64", border: "1.5px solid #4d5a3d", borderRadius: 10, padding: "8px 18px", color: "#fff8ea", fontSize: 13, fontWeight: 700, cursor: "pointer" },
+  editorTitle: { fontSize: 18, fontWeight: 700 },
+  backBtn: { background: "transparent", border: "none", color: "#9ca3af", fontSize: 14, cursor: "pointer", padding: "6px 0" },
+  saveBtn: { background: "#a8e6cf", border: "none", borderRadius: 10, padding: "8px 18px", color: "#0d1a12", fontSize: 14, fontWeight: 700, cursor: "pointer" },
   fieldGroup: { marginBottom: 16 },
   fieldRow: { display: "flex", gap: 10, marginBottom: 16 },
-  fieldLabel: { fontSize: 10, fontWeight: 700, color: "#7c8a64", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 6 },
+  fieldLabel: { fontSize: 11, fontWeight: 700, color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 },
   fieldLabelRow: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  fieldInput: { width: "100%", background: "#fffdf6", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "11px 13px", color: "#2f2a24", fontSize: 13, boxSizing: "border-box" },
-  fieldSelect: { width: "100%", background: "#fffdf6", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "11px 13px", color: "#2f2a24", fontSize: 13 },
+  fieldInput: { width: "100%", background: "#161628", border: "1px solid #ffffff15", borderRadius: 10, padding: "11px 13px", color: "#f0f0f8", fontSize: 14, boxSizing: "border-box" },
+  fieldSelect: { width: "100%", background: "#161628", border: "1px solid #ffffff15", borderRadius: 10, padding: "11px 13px", color: "#f0f0f8", fontSize: 14 },
   macroInputRow: { display: "flex", gap: 8, marginBottom: 16 },
-  macroInputBox: { flex: 1, background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 10, padding: "10px 8px", textAlign: "center" },
-  macroInputLabel: { fontSize: 10, color: "#8b7d6b", marginBottom: 6, textTransform: "uppercase" },
-  macroInput: { width: "100%", background: "transparent", border: "none", color: "#2f2a24", fontSize: 16, fontWeight: 700, textAlign: "center", outline: "none" },
+  macroInputBox: { flex: 1, background: "#161628", border: "1px solid #ffffff0d", borderRadius: 10, padding: "10px 8px", textAlign: "center" },
+  macroInputLabel: { fontSize: 10, color: "#6b7280", marginBottom: 6, textTransform: "uppercase" },
+  macroInput: { width: "100%", background: "transparent", border: "none", color: "#f0f0f8", fontSize: 16, fontWeight: 700, textAlign: "center", outline: "none" },
   ingredientRow: { display: "flex", gap: 8, alignItems: "center", marginBottom: 8 },
-  stepNum: { color: "#c97b5a", fontWeight: 700, fontSize: 13, flexShrink: 0, minWidth: 18 },
-  addRowBtn: { background: "#7c8a6422", border: "1.5px solid #7c8a6466", borderRadius: 8, padding: "4px 10px", color: "#4d5a3d", fontSize: 12, cursor: "pointer" },
-  removeRowBtn: { background: "transparent", border: "none", color: "#c9b99a", fontSize: 14, cursor: "pointer", padding: "4px 6px", flexShrink: 0 },
+  stepNum: { color: "#a8e6cf", fontWeight: 700, fontSize: 13, flexShrink: 0, minWidth: 18 },
+  addRowBtn: { background: "#a8e6cf22", border: "1px solid #a8e6cf44", borderRadius: 8, padding: "4px 10px", color: "#a8e6cf", fontSize: 12, cursor: "pointer" },
+  removeRowBtn: { background: "transparent", border: "none", color: "#6b7280", fontSize: 14, cursor: "pointer", padding: "4px 6px", flexShrink: 0 },
   toggleRow: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 },
-  toggleChip: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 99, padding: "7px 14px", color: "#8b7d6b", fontSize: 12, cursor: "pointer" },
-  toggleChipOn: { background: "#7c8a6422", border: "1.5px solid #7c8a64", color: "#4d5a3d" },
+  toggleChip: { background: "#161628", border: "1px solid #ffffff15", borderRadius: 99, padding: "7px 14px", color: "#9ca3af", fontSize: 13, cursor: "pointer" },
+  toggleChipOn: { background: "#a8e6cf22", border: "1px solid #a8e6cf55", color: "#a8e6cf" },
+  bottomNav: { position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 430, background: "#0d0d1aee", backdropFilter: "blur(20px)", borderTop: "1px solid #ffffff0d", display: "flex", padding: "8px 0 12px" },
+  navBtn: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 3, background: "transparent", border: "none", cursor: "pointer", padding: "6px 0", position: "relative" },
+  navIcon: { fontSize: 18, color: "#6b7280", lineHeight: 1 },
+  navLabel: { fontSize: 10, color: "#6b7280", fontWeight: 600, letterSpacing: "0.05em" },
+  navDot: { width: 4, height: 4, borderRadius: 99, background: "#a8e6cf", position: "absolute", bottom: -2 },
 };
-ENDOFFILE
-echo "Lines: $(wc -l < /home/claude/fixed-App.tsx)"
-Output
-
-Lines: 941
