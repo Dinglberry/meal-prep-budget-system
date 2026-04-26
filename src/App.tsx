@@ -79,9 +79,55 @@ export default function App() {
     () => groceries.reduce((acc, item) => acc + item.estimatedCost, 0),
     [groceries]
   );
-  const budgetRemaining = Number((WEEKLY_BUDGET - groceryTotal).toFixed(2));
-  const budgetPercent = Math.min(100, Math.round((groceryTotal / WEEKLY_BUDGET) * 100));
+  const [budgetTarget, setBudgetTarget] = useState(50);
 
+const [editableGroceries, setEditableGroceries] = useState(() =>
+  groceries.map((item) => ({
+    name: item.name,
+    category: item.category,
+    uses: item.uses,
+    estimatedCost: item.estimatedCost,
+  }))
+);
+
+const editableTotal = Number(
+  editableGroceries.reduce((sum, item) => sum + item.estimatedCost, 0).toFixed(2)
+);
+
+function updateGrocery(
+  index: number,
+  field: "name" | "category" | "estimatedCost",
+  value: string
+) {
+  setEditableGroceries((current) =>
+    current.map((item, i) =>
+      i === index
+        ? {
+            ...item,
+            [field]: field === "estimatedCost" ? Number(value) || 0 : value,
+          }
+        : item
+    )
+  );
+}
+
+function addGroceryItem() {
+  setEditableGroceries((current) => [
+    ...current,
+    {
+      name: "New item",
+      category: "Custom",
+      uses: 1,
+      estimatedCost: 0,
+    },
+  ]);
+}
+
+function deleteGroceryItem(index: number) {
+  setEditableGroceries((current) => current.filter((_, i) => i !== index));
+}
+  const budgetRemaining = Number((budgetTarget - editableTotal).toFixed(2));
+const budgetPercent = Math.min(100, Math.round((editableTotal / budgetTarget) * 100));
   const currentDayRecipes = useMemo(() => {
     const day = plan[selectedDay];
     return Object.entries(day).map(([slot, id]) => ({
