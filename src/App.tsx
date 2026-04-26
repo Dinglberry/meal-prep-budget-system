@@ -47,6 +47,7 @@ type EditableGrocery = { name: string; category: string; uses: number; estimated
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+  const [recipePasteText, setRecipePasteText] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
   const [stomachSafeOnly, setStomachSafeOnly] = useState(true);
@@ -269,12 +270,114 @@ export default function App() {
   const todaySlots = currentDayRecipes.filter(({ recipe }) => recipe);
 
   // ── RECIPE EDITOR ──
+
+  function importRecipeFromText() {
+  const text = recipePasteText.trim();
+
+  if (!text) {
+    alert("Paste a recipe first.");
+    return;
+  }
+
+  if (recipes.length >= 50) {
+    alert("You can only save up to 50 recipes.");
+    return;
+  }
+
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const name = lines[0] || "Untitled Recipe";
+
+  const newRecipe: Recipe = {
+    id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now(),
+    name,
+    category: "Imported",
+    source: "Google Docs",
+    stomachSafe: true,
+    lowSpice: true,
+    noTomato: false,
+    servings: 1,
+    servingSize: "1 serving",
+    ingredients: lines.slice(1, 8).map((line) => ({
+      item: line,
+      amount: "",
+    })),
+    instructions: ["Edit this recipe to add full instructions."],
+    macros: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+    tags: ["imported"],
+    groceryItems: lines.slice(1, 8).map((line) => ({
+      name: line,
+      amount: "",
+      category: "Custom",
+      estimatedCost: 0,
+    })),
+  };
+
+  setRecipes([...recipes, newRecipe]);
+  setEditingRecipe({ ...newRecipe, isNew: false });
+  setRecipePasteText("");
+}
   if (editingRecipe) {
     return (
       <div style={s.shell}>
         <div style={s.statusBar} />
         <div style={s.screenWrap}>
           <div style={s.screen}>
+            <div
+  style={{
+    background: "#fff8ea",
+    border: "1px solid #6f6658",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 16,
+  }}
+>
+  <h3>Paste Recipe From Google Docs</h3>
+
+  <textarea
+    value={recipePasteText}
+    onChange={(e) => setRecipePasteText(e.target.value)}
+    placeholder={`Paste recipe here like:
+
+Greek Yogurt Parfait
+
+Ingredients
+Yogurt
+Berries
+Granola
+
+Instructions
+Layer ingredients.`}
+    style={{
+      width: "100%",
+      minHeight: 150,
+      padding: 10,
+      borderRadius: 10,
+      border: "1px solid #8b806f",
+      boxSizing: "border-box",
+    }}
+  />
+
+  <button
+    type="button"
+    onClick={importRecipeFromText}
+    style={{
+      marginTop: 10,
+      padding: "10px 14px",
+      borderRadius: 999,
+      border: "none",
+      background: "#7c8a64",
+      color: "white",
+      fontWeight: 700,
+      cursor: "pointer",
+    }}
+  >
+    Import Recipe
+  </button>
+</div>
             <div style={s.editorHeader}>
               <button style={s.backBtn} onClick={() => setEditingRecipe(null)}>← Back</button>
               <div style={s.editorTitle}>{editingRecipe.isNew ? "New Recipe" : "Edit Recipe"}</div>
@@ -319,10 +422,7 @@ export default function App() {
                   <input style={{ ...s.fieldInput, flex: 1 }} value={ing.amount} onChange={(e) => updateIngredient(i, "amount", e.target.value)} placeholder="Amount" />
                   <input style={{ ...s.fieldInput, flex: 2 }} value={ing.item} onChange={(e) => updateIngredient(i, "item", e.target.value)} placeholder="Ingredient" />
                   <button style={s.removeRowBtn} onClick={() => setEditingRecipe((prev) => prev ? { ...prev, ingredients: prev.ingredients.filter((_, idx) => idx !== i) } : prev)}>✕</button>
-                </div>
-               
-},
-              ))}
+
             </div>
 
             <div style={s.fieldGroup}>
@@ -373,6 +473,7 @@ export default function App() {
         {/* ── HOME ── */}
         {screen === "home" && (
           <div style={s.screen}>
+           
             <div style={s.homeHeader}>
               <div style={s.homeEyebrow}>Good morning ✦</div>
               <div style={s.homeLogo}>Glow Kitchen</div>
@@ -544,7 +645,7 @@ export default function App() {
 
         {/* ── PLANNER ── */}
         {screen === "planner" && (
-          <div style={s.screen}>
+          
             <div style={s.pageHeader}><div style={s.pageTitle}>Meal Planner</div></div>
             <div style={s.dayScroll}>
               {Object.keys(plan).map((day) => (
