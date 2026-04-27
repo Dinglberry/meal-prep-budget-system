@@ -53,11 +53,70 @@ export default function App() {
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const [budgetTarget, setBudgetTarget] = useState(WEEKLY_BUDGET_DEFAULT);
+  const [incomeType, setIncomeType] = useState<"hourly" | "salary">("hourly");
+const [hourlyRate, setHourlyRate] = useState(16);
+const [hoursPerWeek, setHoursPerWeek] = useState(32);
+const [annualSalary, setAnnualSalary] = useState(35000);
+
+const [householdMembers, setHouseholdMembers] = useState([
+  { age: 25, gender: "female", activity: "active", menstrualPhase: "none" },
+]);
   const weeklyRecipes = useMemo(() => {
     return Object.values(plan).flatMap((day) => Object.values(day))
       .map((id) => getRecipeById(id, recipes))
       .filter((r): r is Recipe => Boolean(r));
   }, [plan, recipes]);
+  function getBaseWeeklyFoodCost(age: number, gender: string) {
+  if (age <= 5) return 38;
+  if (age <= 11) return 52;
+  if (age <= 18) return gender === "male" ? 76 : 66;
+  if (age <= 50) return gender === "male" ? 82 : 72;
+  return gender === "male" ? 76 : 68;
+}
+
+const estimatedWeeklyIncome =
+  incomeType === "hourly" ? hourlyRate * hoursPerWeek : annualSalary / 52;
+
+const householdFoodBase = householdMembers.reduce((sum, member) => {
+  const base = getBaseWeeklyFoodCost(Number(member.age), member.gender);
+  const activityMultiplier = member.activity === "active" ? 1.08 : 1;
+  const cycleMultiplier =
+    member.gender === "female" &&
+    (member.menstrualPhase === "period" || member.menstrualPhase === "pms")
+      ? 1.05
+      : 1;
+
+  return sum + base * activityMultiplier * cycleMultiplier;
+}, 0);
+
+const incomeBasedGroceryBudget = estimatedWeeklyIncome * 0.049;
+const recommendedGroceryBudget = Math.max(
+  incomeBasedGroceryBudget,
+  householdFoodBase
+);
+
+function updateHouseholdMember(index: number, field: string, value: string | number) {
+  setHouseholdMembers((current) =>
+    current.map((member, i) =>
+      i === index ? { ...member, [field]: value } : member
+    )
+  );
+}
+
+function addHouseholdMember() {
+  setHouseholdMembers((current) => [
+    ...current,
+    { age: 25, gender: "female", activity: "sedentary", menstrualPhase: "none" },
+  ]);
+}
+
+function removeHouseholdMember(index: number) {
+  setHouseholdMembers((current) => current.filter((_, i) => i !== index));
+}
+
+function applyRecommendedBudget() {
+  setBudgetTarget(Number(recommendedGroceryBudget.toFixed(2)));
+}
   const baseGroceries = useMemo(() => aggregateGroceries(weeklyRecipes), [weeklyRecipes]);
   const [editableGroceries, setEditableGroceries] = useState<EditableGrocery[]>(() =>
     aggregateGroceries(initialRecipes).map((item) => ({
@@ -644,6 +703,130 @@ export default function App() {
         {screen === "budget" && (
           <div style={s.screen}>
             <div style={s.pageHeader}><div style={s.pageTitle}>Budget & Groceries</div></div>
+            <div style={s.budgetCard}>
+  <div style={s.budgetSectionTitle}>Grocery Budget Calculator</div>
+
+  <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+    <button
+      style={incomeType === "hourly" ? s.chipActive : s.chip}
+      onClick={() => setIncomeType("hourly")}
+    >
+      Hourly
+    </button>
+    <button
+      style={incomeType === "salary" ? s.chipActive : s.chip}
+      onClick={() => setIncomeType("salary")}
+    >
+      Salary
+    </button>
+  </div>
+
+  {incomeType === "hourly" ? (
+    <div style={s.profileCard}>
+      <div>
+        <div style={s.profileFieldLabel}>Hourly Rate</div>
+        <input
+          type="number"
+          style={s.profileInput}
+          value={hourlyRate}
+          onChange={(e) => setHourlyRate(Number(e.target.value) || 0)}
+        />
+      </div>
+      <div>
+        <div style={s.profileFieldLabel}>Hours / Week</div>
+        <input
+          type="number"
+          style={s.profileInput}
+          value={hoursPerWeek}
+          onChange={(e) => setHoursPerWeek(Number(e.target.value) || 0)}
+        />
+      </div>
+    </div>
+  ) : (
+    <div style={s.profileCard}>
+      <div>
+        <div style={s.profileFieldLabel}>Annual Salary</div>
+        <input
+          type="number"
+          style={s.profileInput}
+          value={annualSalary}
+          onChange={(e) => setAnnualSalary(Number(e.target.value) || 0)}
+        />
+      </div>
+    </div>
+  )}
+
+  <div style={s.sectionLabel}>Household Members</div>
+
+  {householdMembers.map((member, index) => (
+    <div key={index} style={s.groceryEditRow}>
+      <div style={{ flex: 1 }}>
+        <input
+          type="number"
+          style={s.profileInput}
+          value={member.age}
+          onChange={(e) => updateHouseholdMember(index, "age", Number(e.target.value) || 0)}
+          placeholder="Age"
+        />
+
+        <select
+          style={s.profileInput}
+          value={member.gender}
+          onChange={(e) => updateHouseholdMember(index, "gender", e.target.value)}
+        >
+          <option value="female">Female</option>
+          <option value="male">Male</option>
+          <option value="other">Other</option>
+        </select>
+
+        <select
+          style={s.profileInput}
+          value={member.activity}
+          onChange={(e) => updateHouseholdMember(index, "activity", e.target.value)}
+        >
+          <option value="sedentary">Sedentary</option>
+          <option value="active">Physically active</option>
+        </select>
+
+        <select
+          style={s.profileInput}
+          value={member.menstrualPhase}
+          onChange={(e) => updateHouseholdMember(index, "menstrualPhase", e.target.value)}
+        >
+          <option value="none">No period/PMS adjustment</option>
+          <option value="pms">PMS / luteal phase</option>
+          <option value="period">On period</option>
+        </select>
+      </div>
+
+      <button style={s.groceryDeleteBtn} onClick={() => removeHouseholdMember(index)}>
+        ✕
+      </button>
+    </div>
+  ))}
+
+  <button style={s.addGroceryBtn} onClick={addHouseholdMember}>
+    + Add Household Member
+  </button>
+
+  <div style={s.budgetSub}>
+    Estimated weekly income: {currency(estimatedWeeklyIncome)}
+  </div>
+  <div style={s.budgetSub}>
+    Income-based grocery target: {currency(incomeBasedGroceryBudget)}
+  </div>
+  <div style={s.budgetBigMonthly}>
+    Recommended weekly grocery budget: {currency(recommendedGroceryBudget)}
+  </div>
+
+  <button style={s.importBtn} onClick={applyRecommendedBudget}>
+    Use This as Weekly Budget
+  </button>
+
+  <div style={s.disclaimer}>
+    This is an estimate. Period/PMS mode adds a small food buffer for appetite/cravings, especially around the luteal or pre-period phase.
+  </div>
+</div>
             <div style={s.budgetCard}>
               <div style={s.budgetCardRow}>
                 <div>
