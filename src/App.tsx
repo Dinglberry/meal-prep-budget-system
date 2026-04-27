@@ -596,16 +596,34 @@ function applyRecommendedBudget() {
             </div>
 
             <input style={s.searchBar} value={query} onChange={(e) => setQuery(e.target.value)} placeholder="🔍  Search recipes or tags…" />
-            <div style={s.chipRow}>
-              {categories.map((cat) => (
-                <button key={cat} style={{ ...s.chip, ...(category === cat ? s.chipActive : {}) }} onClick={() => setCategory(cat)}>
-                  {cat === ALL_CATEGORIES ? "All" : cat}
-                </button>
-              ))}
+            <div style={s.categoryCardRow}>
+  {categories.map((cat) => {
+    const label = cat === ALL_CATEGORIES ? "All" : cat;
+    const icon = categoryArt[label] ?? "🍽️";
+
+    return (
+      <button
+        key={cat}
+        style={{
+          ...s.categoryCard,
+          ...(category === cat ? s.categoryCardActive : {}),
+        }}
+        onClick={() => setCategory(cat)}
+      >
+        <div style={s.categoryIconBubble}>{icon}</div>
+        <div style={s.categoryCardLabel}>{label}</div>
+      </button>
+    );
+  })}
+</div>
+
+<div style={s.chipRow}>
+             
               <button style={{ ...s.chip, ...(stomachSafeOnly ? s.chipGreen : {}) }} onClick={() => setStomachSafeOnly(!stomachSafeOnly)}>
                 {stomachSafeOnly ? "✓ " : ""}Stomach-safe
               </button>
             </div>
+       
             <div style={s.planStrip}>
               <span style={s.planStripLabel}>Adding to →</span>
               <select style={s.miniSelect} value={selectedDay} onChange={(e) => handleDayChange(e.target.value as DayKey)}>
@@ -1119,6 +1137,50 @@ importBtn: {
 },
   searchBar: { width: "100%", background: "#fffdf6", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "12px 16px", color: "#2f2a24", fontSize: 14, marginBottom: 12, boxSizing: "border-box", fontFamily: "Georgia, serif" },
   chipRow: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 },
+
+  categoryCardRow: {
+  display: "flex",
+  gap: 12,
+  overflowX: "auto",
+  padding: "4px 0 14px",
+  marginBottom: 6,
+},
+
+categoryCard: {
+  minWidth: 92,
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 22,
+  padding: "12px 10px",
+  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+  color: "#5A3827",
+  cursor: "pointer",
+  textAlign: "center",
+},
+
+categoryCardActive: {
+  background: "#FFE7C2",
+  border: "1.5px solid #0B5A3C",
+  boxShadow: "4px 4px 0 rgba(11,90,60,0.16)",
+},
+
+categoryIconBubble: {
+  width: 46,
+  height: 46,
+  margin: "0 auto 8px",
+  borderRadius: 18,
+  background: "#FFF1D1",
+  border: "1.5px solid #E8CFA3",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontSize: 25,
+},
+
+categoryCardLabel: {
+  fontSize: 11,
+  fontWeight: 700,
+},
   chip: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 99, padding: "5px 13px", fontSize: 12, color: "#8b7d6b", cursor: "pointer" },
   chipActive: { background: "#7c8a6422", border: "1.5px solid #7c8a64", color: "#4d5a3d" },
   chipGreen: { background: "#7c8a6422", border: "1.5px solid #7c8a64", color: "#4d5a3d" },
