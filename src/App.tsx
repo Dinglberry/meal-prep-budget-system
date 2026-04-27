@@ -48,6 +48,17 @@ export default function App() {
   const [selectedDay, setSelectedDay] = useState<DayKey>("Monday");
   const [selectedSlot, setSelectedSlot] = useState<SlotKey>("breakfast");
   const [addedId, setAddedId] = useState<string | null>(null);
+  const categoryArt: Record<string, string> = {
+  Breakfast: "🥣",
+  Bowls: "🍚",
+  Snacks: "🍫",
+  Drinks: "🧋",
+  Imported: "📋",
+  "Fruits & Vegetables": "🥕",
+  Proteins: "🍗",
+  "Grains & Pasta": "🍝",
+  "Dairy & Eggs": "🥛",
+};
   const [expandedRecipe, setExpandedRecipe] = useState<string | null>(null);
   const [editingRecipe, setEditingRecipe] = useState<(Recipe & { isNew?: boolean }) | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
@@ -613,7 +624,12 @@ function applyRecommendedBudget() {
                   <div key={recipe.id} style={s.recipeCard}>
                     <button style={s.recipeCardHeader} onClick={() => setExpandedRecipe(isExpanded ? null : recipe.id)}>
                       <div style={s.recipeCardLeft}>
-                        <div style={s.recipeCardName}>{recipe.name}</div>
+                        <div style={s.recipeCardName}>
+  <span style={s.foodIcon}>
+    {categoryArt[recipe.category] ?? "🍽️"}
+  </span>
+  {recipe.name}
+</div>
                         <div style={s.recipeCardMeta}>{recipe.category} · {recipe.macros.calories} cal · {recipe.macros.protein}g protein</div>
                       </div>
                       <div style={s.recipeChevron}>{isExpanded ? "▲" : "▼"}</div>
@@ -703,6 +719,7 @@ function applyRecommendedBudget() {
         {screen === "budget" && (
           <div style={s.screen}>
             <div style={s.pageHeader}><div style={s.pageTitle}>Budget & Groceries</div></div>
+            
             <div style={s.budgetCard}>
   <div style={s.budgetSectionTitle}>Grocery Budget Calculator</div>
 
@@ -1010,13 +1027,40 @@ function applyRecommendedBudget() {
 }
 
 const s: Record<string, React.CSSProperties> = {
-  shell: { maxWidth: 430, margin: "0 auto", minHeight: "100vh", background: "#f4efe3", backgroundImage: "radial-gradient(rgba(80,70,55,0.07) 1px, transparent 1px)", backgroundSize: "18px 18px", color: "#2f2a24", display: "flex", flexDirection: "column", fontFamily: "Georgia, 'Times New Roman', serif", position: "relative", overflow: "hidden" },
-  statusBar: { height: 4, background: "linear-gradient(90deg, #7c8a64, #c9a87c, #c97b5a, #7c8a64)", flexShrink: 0 },
-  screenWrap: { flex: 1, overflowY: "auto", overflowX: "hidden", paddingBottom: 32 },
-  screen: { padding: "20px 16px 0" },
-  topNav: { display: "flex", borderBottom: "1.5px solid #c9b99a", background: "#fff8eaf0", backdropFilter: "blur(8px)", flexShrink: 0, overflowX: "auto" },
+  shell: {
+  maxWidth: 430,
+  margin: "0 auto",
+  minHeight: "100vh",
+  background: "#FFF6DF",
+  backgroundImage:
+    "radial-gradient(rgba(120,100,80,0.08) 1px, transparent 1px)",
+  backgroundSize: "18px 18px",
+  color: "#5A3827",
+  display: "flex",
+  flexDirection: "column",
+  fontFamily: "Georgia, 'Times New Roman', serif",
+  position: "relative",
+  overflow: "hidden",
+},
+topNav: {
+  display: "flex",
+  borderBottom: "1.5px solid #E8CFA3",
+  background: "#FFF6DFEE",
+  backdropFilter: "blur(8px)",
+  flexShrink: 0,
+  overflowX: "auto",
+},
   topNavBtn: { flex: 1, padding: "10px 4px", background: "transparent", border: "none", fontSize: 11, fontWeight: 700, color: "#8b7d6b", cursor: "pointer", letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "Georgia, serif", whiteSpace: "nowrap" },
-  topNavBtnActive: { color: "#4d5a3d", borderBottom: "2.5px solid #7c8a64" },
+topNavBtnActive: {
+  color: "#0B5A3C",
+  borderBottom: "2.5px solid #0B5A3C",
+},
+card: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 22,
+  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+},
   homeHeader: { marginBottom: 24, paddingTop: 8 },
   homeEyebrow: { fontSize: 11, color: "#7c8a64", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 },
   homeLogo: { fontSize: 30, fontWeight: 700, letterSpacing: "0.01em", lineHeight: 1, color: "#2f2a24" },
@@ -1042,11 +1086,37 @@ const s: Record<string, React.CSSProperties> = {
   emptyState: { textAlign: "center", color: "#8b7d6b", padding: "24px 0", fontSize: 13, marginBottom: 24, fontStyle: "italic" },
   pageHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, paddingTop: 8 },
   pageTitle: { fontSize: 24, fontWeight: 700, letterSpacing: "0.01em", color: "#2f2a24" },
-  newRecipeBtn: { background: "#7c8a64", border: "1.5px solid #4d5a3d", borderRadius: 20, padding: "8px 14px", color: "#fff8ea", fontSize: 12, fontWeight: 700, cursor: "pointer" },
-  importCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 16, padding: 14, marginBottom: 16, boxShadow: "2px 2px 0 rgba(79,70,55,0.08)" },
+newRecipeBtn: {
+  background: "#0B5A3C",
+  border: "1.5px solid #073C29",
+  borderRadius: 20,
+  padding: "8px 14px",
+  color: "#FFF6DF",
+  fontSize: 12,
+  fontWeight: 700,
+  cursor: "pointer",
+},
+importCard: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 22,
+  padding: 14,
+  marginBottom: 16,
+  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+},
   importTitle: { fontSize: 13, fontWeight: 700, color: "#2f2a24", marginBottom: 10 },
   importTextarea: { width: "100%", minHeight: 100, padding: "10px 12px", borderRadius: 10, border: "1.5px solid #c9b99a", background: "#fffdf6", color: "#2f2a24", fontSize: 13, fontFamily: "Georgia, serif", boxSizing: "border-box", resize: "vertical" },
-  importBtn: { marginTop: 10, padding: "9px 16px", borderRadius: 20, border: "none", background: "#7c8a64", color: "#fff8ea", fontWeight: 700, cursor: "pointer", fontSize: 13 },
+importBtn: {
+  marginTop: 10,
+  padding: "9px 16px",
+  borderRadius: 20,
+  border: "none",
+  background: "#0B5A3C",
+  color: "#FFF6DF",
+  fontWeight: 700,
+  cursor: "pointer",
+  fontSize: 13,
+},
   searchBar: { width: "100%", background: "#fffdf6", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "12px 16px", color: "#2f2a24", fontSize: 14, marginBottom: 12, boxSizing: "border-box", fontFamily: "Georgia, serif" },
   chipRow: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 },
   chip: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 99, padding: "5px 13px", fontSize: 12, color: "#8b7d6b", cursor: "pointer" },
@@ -1056,7 +1126,13 @@ const s: Record<string, React.CSSProperties> = {
   planStripLabel: { fontSize: 12, color: "#8b7d6b", flexShrink: 0, fontStyle: "italic" },
   miniSelect: { background: "#fffdf6", border: "1px solid #c9b99a", borderRadius: 8, padding: "5px 10px", color: "#4d5a3d", fontSize: 12, cursor: "pointer" },
   recipeList: { display: "flex", flexDirection: "column", gap: 10 },
-  recipeCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 18, overflow: "hidden", boxShadow: "3px 3px 0 rgba(79,70,55,0.10)" },
+recipeCard: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 22,
+  overflow: "hidden",
+  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+},
   recipeCardHeader: { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", width: "100%", background: "transparent", border: "none", color: "#2f2a24", cursor: "pointer", textAlign: "left", gap: 12 },
   recipeCardLeft: { flex: 1 },
   recipeCardName: { fontSize: 15, fontWeight: 700, color: "#2f2a24" },
@@ -1100,7 +1176,14 @@ const s: Record<string, React.CSSProperties> = {
   slotCardName: { fontSize: 15, fontWeight: 700, marginBottom: 4, color: "#2f2a24" },
   slotCardMeta: { fontSize: 12, color: "#8b7d6b", fontStyle: "italic" },
   goRecipesBtn: { width: "100%", background: "#7c8a64", border: "1.5px solid #4d5a3d", borderRadius: 14, padding: "14px", color: "#fff8ea", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 16, boxShadow: "3px 3px 0 rgba(79,70,55,0.15)" },
-  budgetCard: { background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 20, padding: 20, marginBottom: 20, boxShadow: "4px 4px 0 rgba(79,70,55,0.10)" },
+budgetCard: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 22,
+  padding: 20,
+  marginBottom: 20,
+  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+},
   budgetCardRow: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
   budgetBig: { fontSize: 34, fontWeight: 700, letterSpacing: "-0.01em", color: "#2f2a24" },
   budgetSub: { fontSize: 12, color: "#8b7d6b", marginTop: 4, fontStyle: "italic" },
