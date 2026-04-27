@@ -36,7 +36,43 @@ function slugify(name: string) {
 }
 
 type EditableGrocery = { name: string; category: string; uses: number; estimatedCost: number; priceText?: string };
+function FoodIcon({ type }: { type: string }) {
+  const colors: Record<string, string> = {
+    Breakfast: "#F7C873",
+    Bowls: "#A9B17A",
+    Drinks: "#F2A07F",
+    Snacks: "#C58BD3",
+    Imported: "#8EC5D6",
+    Proteins: "#E98973",
+    "Fruits & Vegetables": "#93C47D",
+    "Grains & Pasta": "#E6B86A",
+    "Dairy & Eggs": "#F4DFA3",
+  };
 
+  const color = colors[type] ?? "#F7C873";
+
+  return (
+    <svg width="46" height="46" viewBox="0 0 46 46">
+      <circle cx="23" cy="23" r="20" fill={color} opacity="0.95" />
+      <circle cx="17" cy="19" r="2.2" fill="#5A3827" />
+      <circle cx="29" cy="19" r="2.2" fill="#5A3827" />
+      <path
+        d="M17 28c3 3 9 3 12 0"
+        stroke="#5A3827"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14 12c4-5 14-5 18 0"
+        stroke="#FFF6DF"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
@@ -571,7 +607,9 @@ function applyRecommendedBudget() {
         ["Beverages", "🧋"],
       ].map(([label, icon]) => (
         <button key={label} style={s.homeCategoryCard} onClick={() => setScreen("recipes")}>
-          <div style={s.homeCategoryIcon}>{icon}</div>
+          <div style={s.homeCategoryIcon}>
+  <FoodIcon type={label} />
+</div>
           <div style={s.homeCategoryLabel}>{label}</div>
         </button>
       ))}
@@ -661,7 +699,9 @@ function applyRecommendedBudget() {
         }}
         onClick={() => setCategory(cat)}
       >
-        <div style={s.categoryIconBubble}>{icon}</div>
+       <div style={s.categoryIconBubble}>
+  <FoodIcon type={label} />
+</div>
         <div style={s.categoryCardLabel}>{label}</div>
       </button>
     );
