@@ -408,33 +408,17 @@ export default function App() {
               {/* Illustrated background with gradient */}
               <div style={s.heroIllustration}>
                 {/* Decorative elements mimicking the illustrated style */}
-                {(() => {
-                  const imgs = ["h1.png","h2.png","h3.png","h4.png","h5.png","h6.png","h7.png","h8.png","h9.png"];
-                  const grids: Record<string,[number,number]> = {"h1.png":[4,3],"h2.png":[4,4],"h3.png":[5,3],"h4.png":[5,3],"h5.png":[4,3],"h6.png":[4,4],"h7.png":[5,3],"h8.png":[5,5],"h9.png":[5,5]};
-                  const img = imgs[Math.floor(Math.random() * imgs.length)];
-                  const [cols, rows] = grids[img];
-                  const col = Math.floor(Math.random() * cols);
-                  const row = Math.floor(Math.random() * rows);
-                  return (
-                    <>
-                      <img
-                        src={`/meal-prep-budget-system/heroes/${img}`}
-                        alt="hero"
-                        style={{
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-  objectPosition: "center",
-  display: "block",
-}}
-                      />
-                      <div style={{ position:"absolute", top:16, left:14, background:"rgba(255,255,255,0.92)", borderRadius:16, padding:"12px 16px", maxWidth:170, boxShadow:"0 4px 16px rgba(0,0,0,0.10)", zIndex:2 }}>
-                        <div style={{ fontSize:13, fontWeight:600, color:"#3a3228", lineHeight:1.4 }}>Let's plan something<br/>healthy and delicious!</div>
-                        <div style={{ position:"absolute", bottom:-9, left:20, width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid rgba(255,255,255,0.92)" }} />
-                      </div>
-                    </>
-                  );
-                })()}
+                <img
+  src="/meal-prep-budget-system/heroes/h1.png"
+  alt="Glow Kitchen hero"
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    objectPosition: "center",
+    display: "block",
+  }}
+/>
               </div>
             </div>
 
