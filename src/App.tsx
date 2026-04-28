@@ -36,36 +36,91 @@ function slugify(name: string) {
 }
 
 type EditableGrocery = { name: string; category: string; uses: number; estimatedCost: number; priceText?: string };
+type EditableGrocery = { name: string; category: string; uses: number; estimatedCost: number; priceText?: string };
+
 function FoodIcon({ type }: { type: string }) {
-  const colors: Record<string, string> = {
-    Breakfast: "#F7C873",
-    Bowls: "#A9B17A",
-    Drinks: "#F2A07F",
-    Snacks: "#C58BD3",
-    Imported: "#8EC5D6",
-    Proteins: "#E98973",
-    "Fruits & Vegetables": "#93C47D",
-    "Grains & Pasta": "#E6B86A",
-    "Dairy & Eggs": "#F4DFA3",
-  };
+  switch (type) {
+    case "Fruits & Vegetables":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <ellipse cx="23" cy="26" rx="10" ry="14" fill="#F4A261" />
+          <path d="M23 10 C20 14, 18 16, 20 20" stroke="#6B8E23" strokeWidth="3" fill="none" strokeLinecap="round" />
+          <path d="M23 10 C26 14, 28 16, 26 20" stroke="#93C47D" strokeWidth="3" fill="none" strokeLinecap="round" />
+        </svg>
+      );
 
-  const color = colors[type] ?? "#F7C873";
+    case "Proteins":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <ellipse cx="23" cy="24" rx="13" ry="10" fill="#E98973" />
+          <circle cx="31" cy="16" r="4" fill="#FFF6DF" />
+        </svg>
+      );
 
-  return (
-    <svg width="46" height="46" viewBox="0 0 46 46">
-      {/* soft shadow */}
-      <ellipse cx="23" cy="30" rx="12" ry="6" fill="rgba(0,0,0,0.08)" />
-      {/* base */}
-      <circle cx="23" cy="22" r="18" fill={color} />
-      {/* highlight */}
-      <circle cx="18" cy="17" r="8" fill="#FFFFFF" opacity="0.25" />
-      {/* face */}
-      <circle cx="17" cy="20" r="2.2" fill="#5A3827" />
-      <circle cx="29" cy="20" r="2.2" fill="#5A3827" />
-      <path d="M17 28c3 3 9 3 12 0" stroke="#5A3827" strokeWidth="2" fill="none" strokeLinecap="round" />
-    </svg>
-  );
+    case "Grains & Pasta":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <ellipse cx="23" cy="28" rx="14" ry="7" fill="#E6B86A" />
+          <path d="M14 20 C18 14, 28 14, 32 20" stroke="#F4DFA3" strokeWidth="3" fill="none" />
+          <path d="M16 24 C20 18, 26 18, 30 24" stroke="#F4DFA3" strokeWidth="3" fill="none" />
+        </svg>
+      );
+
+    case "Dairy & Eggs":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <rect x="16" y="12" width="14" height="22" rx="4" fill="#FFF6DF" stroke="#E8CFA3" strokeWidth="2" />
+          <rect x="19" y="8" width="8" height="5" rx="2" fill="#A9D6E5" />
+        </svg>
+      );
+
+    case "Snacks":
+    case "Snacks & Treats":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <rect x="14" y="14" width="18" height="18" rx="4" fill="#C58BD3" />
+          <line x1="20" y1="14" x2="20" y2="32" stroke="#FFF6DF" strokeWidth="2" />
+          <line x1="26" y1="14" x2="26" y2="32" stroke="#FFF6DF" strokeWidth="2" />
+        </svg>
+      );
+
+    case "Drinks":
+    case "Beverages":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <path d="M16 14 H30 L28 34 H18 Z" fill="#F2A07F" />
+          <path d="M20 10 L26 10" stroke="#5A3827" strokeWidth="2" />
+          <path d="M23 10 V6" stroke="#5A3827" strokeWidth="2" />
+        </svg>
+      );
+
+    case "Breakfast":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <ellipse cx="23" cy="27" rx="14" ry="8" fill="#A9B17A" />
+          <ellipse cx="23" cy="23" rx="10" ry="5" fill="#FFF6DF" />
+        </svg>
+      );
+
+    case "Bowls":
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <path d="M12 24 H34 C34 32 29 36 23 36 C17 36 12 32 12 24Z" fill="#A9B17A" />
+          <ellipse cx="23" cy="24" rx="11" ry="4" fill="#FFF6DF" />
+        </svg>
+      );
+
+    default:
+      return (
+        <svg width="46" height="46" viewBox="0 0 46 46">
+          <circle cx="23" cy="23" r="14" fill="#F7C873" />
+        </svg>
+      );
+  }
 }
+
+
+
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
