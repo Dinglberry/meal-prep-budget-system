@@ -423,7 +423,7 @@ export default function App() {
         width: "88%",
         height: "88%",
         objectFit: "cover",
-        objectPosition: "center",
+        objectPosition: "center top",
         display: "block",
       }}
     />
