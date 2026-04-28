@@ -409,10 +409,9 @@ export default function App() {
               <div style={s.heroIllustration}>
                 {/* Decorative elements mimicking the illustrated style */}
                 {(() => {
-  const heroes = Array.from({ length: 20 }, (_, i) =>
-  `/meal-prep-budget-system/heroes/custom/hero-${String(i + 1).padStart(2, "0")}.png`
-);
-
+  const heroes = Array.from({ length: 32 }, (_, i) =>
+    `/meal-prep-budget-system/heroes/custom/hero-${String(i + 1).padStart(2, "0")}.png`
+  );
 
   const img = heroes[Math.floor(Math.random() * heroes.length)];
 
