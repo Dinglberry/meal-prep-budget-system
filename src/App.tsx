@@ -657,6 +657,7 @@ function applyRecommendedBudget() {
         ["Beverages", "🧋"],
       ].map(([label, icon]) => (
         <button key={label} style={{ ...s.homeCategoryCard, ...s.stationeryPanel }}onClick={() => setScreen("recipes")}>
+         <div style={s.categorySticker}>Fresh pick</div>
           <div style={s.homeCategoryIcon}>
   <FoodIcon type={label} />
 </div>
@@ -1217,6 +1218,20 @@ stationeryPanel: {
   borderRadius: 30,
   boxShadow: "0 14px 30px rgba(90,56,39,0.10)",
   overflow: "hidden",
+},
+categorySticker: {
+  position: "absolute",
+  top: 8,
+  left: 10,
+  background: "#F8C8B8",
+  color: "#5A3827",
+  border: "1px solid #E8A38D",
+  borderRadius: 999,
+  padding: "3px 8px",
+  fontSize: 9,
+  fontWeight: 800,
+  transform: "rotate(-4deg)",
+  boxShadow: "2px 2px 0 rgba(90,56,39,0.08)",
 },
 
 paperTape: {
