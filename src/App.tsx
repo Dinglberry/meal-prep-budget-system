@@ -582,36 +582,41 @@ function applyRecommendedBudget() {
               ))}
             </div>
             <div style={{ height: 40 }} />
-         <nav style={s.bottomNav}>
-  {(["home", "recipes", "planner", "budget", "insights"] as Screen[]).map((sc) => {
-    const icons: Record<Screen, string> = {
-      home: "⌂",
-      recipes: "◈",
-      planner: "▦",
-      budget: "◎",
-      insights: "✦",
-    };
+               </div>
 
-    return (
-      <button
-        key={sc}
-        style={{
-          ...s.bottomNavBtn,
-          ...(screen === sc ? s.bottomNavBtnActive : {}),
-        }}
-        onClick={() => setScreen(sc)}
-      >
-        <span style={s.bottomNavIcon}>{icons[sc]}</span>
-        <span style={s.bottomNavLabel}>{sc}</span>
-      </button>
-    );
-  })}
-</nav>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      <nav style={s.bottomNav}>
+        {(["home", "recipes", "planner", "budget", "insights"] as Screen[]).map((sc) => {
+          const icons: Record<Screen, string> = {
+            home: "⌂",
+            recipes: "◈",
+            planner: "▦",
+            budget: "◎",
+            insights: "✦",
+          };
+
+          return (
+            <button
+              key={sc}
+              style={{
+                ...s.bottomNavBtn,
+                ...(screen === sc ? s.bottomNavBtnActive : {}),
+              }}
+              onClick={() => setScreen(sc)}
+            >
+              <span style={s.bottomNavIcon}>{icons[sc]}</span>
+              <span style={s.bottomNavLabel}>{sc}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </div>
+    </div>
+  
+  );
+}
+         
+    
+
 
   return (
     <div style={s.shell}>
