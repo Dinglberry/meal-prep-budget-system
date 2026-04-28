@@ -408,21 +408,34 @@ export default function App() {
               {/* Illustrated background with gradient */}
               <div style={s.heroIllustration}>
                 {/* Decorative elements mimicking the illustrated style */}
-                <div style={s.heroBgCircle1} />
-                <div style={s.heroBgCircle2} />
-                <div style={s.heroFlowers}>🌸🌿🌼</div>
-                <div style={s.heroFigure}>
-                  <div style={s.heroCharacter}>
-                    {/* Stylized character using CSS */}
-                    <div style={s.heroCharHead}>🧖‍♀️</div>
-                  </div>
-                  <div style={s.heroCat}>🐈</div>
-                </div>
-                {/* Speech bubble */}
-                <div style={s.speechBubble}>
-                  <div style={s.speechBubbleText}>Let's plan something<br/>healthy and delicious!</div>
-                  <div style={s.speechBubbleTail} />
-                </div>
+                {(() => {
+                  const imgs = ["h1.png","h2.png","h3.png","h4.png","h5.png","h6.png","h7.png","h8.png","h9.png"];
+                  const grids: Record<string,[number,number]> = {"h1.png":[4,3],"h2.png":[4,4],"h3.png":[5,3],"h4.png":[5,3],"h5.png":[4,3],"h6.png":[4,4],"h7.png":[5,3],"h8.png":[5,5],"h9.png":[5,5]};
+                  const img = imgs[Math.floor(Math.random() * imgs.length)];
+                  const [cols, rows] = grids[img];
+                  const col = Math.floor(Math.random() * cols);
+                  const row = Math.floor(Math.random() * rows);
+                  return (
+                    <>
+                      <img
+                        src={`/meal-prep-budget-system/heroes/${img}`}
+                        alt="hero"
+                        style={{
+                          width: `${cols * 100}%`,
+                          height: `${rows * 100}%`,
+                          position: "absolute",
+                          top: `${-(row / (rows - 1 || 1)) * (rows - 1) * 100}%`,
+                          left: `${-(col / (cols - 1 || 1)) * (cols - 1) * 100}%`,
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div style={{ position:"absolute", top:16, left:14, background:"rgba(255,255,255,0.92)", borderRadius:16, padding:"12px 16px", maxWidth:170, boxShadow:"0 4px 16px rgba(0,0,0,0.10)", zIndex:2 }}>
+                        <div style={{ fontSize:13, fontWeight:600, color:"#3a3228", lineHeight:1.4 }}>Let's plan something<br/>healthy and delicious!</div>
+                        <div style={{ position:"absolute", bottom:-9, left:20, width:0, height:0, borderLeft:"9px solid transparent", borderRight:"9px solid transparent", borderTop:"9px solid rgba(255,255,255,0.92)" }} />
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             </div>
 
