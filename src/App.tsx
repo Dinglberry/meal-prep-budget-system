@@ -424,9 +424,9 @@ export default function App() {
                           width: `${cols * 100}%`,
                           height: `${rows * 100}%`,
                           position: "absolute",
-                          top: `${-(row / (rows - 1 || 1)) * (rows - 1) * 100}%`,
-                          left: `${-(col / (cols - 1 || 1)) * (cols - 1) * 100}%`,
-                          objectFit: "cover",
+                          top: `${-(row / rows) * 100}%`,
+                          left: `${-(col / cols) * 100}%`,
+                          objectFit: "fill",
                         }}
                       />
                       <div style={{ position:"absolute", top:16, left:14, background:"rgba(255,255,255,0.92)", borderRadius:16, padding:"12px 16px", maxWidth:170, boxShadow:"0 4px 16px rgba(0,0,0,0.10)", zIndex:2 }}>
