@@ -53,23 +53,16 @@ function FoodIcon({ type }: { type: string }) {
 
   return (
     <svg width="46" height="46" viewBox="0 0 46 46">
-      <circle cx="23" cy="23" r="20" fill={color} opacity="0.95" />
-      <circle cx="17" cy="19" r="2.2" fill="#5A3827" />
-      <circle cx="29" cy="19" r="2.2" fill="#5A3827" />
-      <path
-        d="M17 28c3 3 9 3 12 0"
-        stroke="#5A3827"
-        strokeWidth="2"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <path
-        d="M14 12c4-5 14-5 18 0"
-        stroke="#FFF6DF"
-        strokeWidth="3"
-        fill="none"
-        strokeLinecap="round"
-      />
+      {/* soft shadow */}
+      <ellipse cx="23" cy="30" rx="12" ry="6" fill="rgba(0,0,0,0.08)" />
+      {/* base */}
+      <circle cx="23" cy="22" r="18" fill={color} />
+      {/* highlight */}
+      <circle cx="18" cy="17" r="8" fill="#FFFFFF" opacity="0.25" />
+      {/* face */}
+      <circle cx="17" cy="20" r="2.2" fill="#5A3827" />
+      <circle cx="29" cy="20" r="2.2" fill="#5A3827" />
+      <path d="M17 28c3 3 9 3 12 0" stroke="#5A3827" strokeWidth="2" fill="none" strokeLinecap="round" />
     </svg>
   );
 }
@@ -1142,22 +1135,23 @@ const s: Record<string, React.CSSProperties> = {
   minHeight: "100vh",
   background: "#FFF6DF",
   backgroundImage:
-    "radial-gradient(rgba(120,100,80,0.08) 1px, transparent 1px)",
+    "radial-gradient(rgba(90,56,39,0.06) 1px, transparent 1px)",
   backgroundSize: "18px 18px",
   color: "#5A3827",
   display: "flex",
   flexDirection: "column",
-  fontFamily: "Georgia, 'Times New Roman', serif",
+  fontFamily:
+    "'Trebuchet MS', 'Avenir Next', 'Nunito', system-ui, sans-serif",
   position: "relative",
   overflow: "hidden",
 },
 homeHeroCard: {
   background: "#FFF9EA",
   border: "1.5px solid #E8CFA3",
-  borderRadius: 26,
-  padding: 16,
-  marginBottom: 18,
-  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+  borderRadius: 30,
+  padding: 18,
+  marginBottom: 20,
+  boxShadow: "0 10px 24px rgba(90,56,39,0.08)",
 },
 
 homeTopRow: {
@@ -1179,10 +1173,10 @@ bellButton: {
 },
 
 heroImageBox: {
-  height: 220,
-  borderRadius: 22,
+  height: 230,
+  borderRadius: 26,
   background:
-    "linear-gradient(180deg, #FFF1D1 0%, #FFE7C2 55%, #F8C8B8 100%)",
+    "linear-gradient(180deg, #FFF1D1 0%, #FFE7C2 52%, #F8C8B8 100%)",
   border: "1.5px solid #E8CFA3",
   position: "relative",
   overflow: "hidden",
@@ -1220,17 +1214,17 @@ heroCat: {
 quickActionGrid: {
   display: "grid",
   gridTemplateColumns: "repeat(4, 1fr)",
-  gap: 10,
-  marginBottom: 20,
+  gap: 12,
+  marginBottom: 22,
 },
 
 quickActionCard: {
   background: "#FFF9EA",
   border: "1.5px solid #E8CFA3",
-  borderRadius: 18,
-  padding: "12px 6px",
+  borderRadius: 22,
+  padding: "14px 7px",
   color: "#5A3827",
-  boxShadow: "3px 3px 0 rgba(90,56,39,0.08)",
+  boxShadow: "0 8px 18px rgba(90,56,39,0.07)",
   cursor: "pointer",
 },
 
@@ -1247,47 +1241,47 @@ quickActionText: {
 homeCategoryGrid: {
   display: "grid",
   gridTemplateColumns: "repeat(2, 1fr)",
-  gap: 12,
-  marginBottom: 20,
+  gap: 14,
+  marginBottom: 22,
 },
 
 homeCategoryCard: {
   background: "#FFF9EA",
   border: "1.5px solid #E8CFA3",
-  borderRadius: 22,
-  padding: 14,
+  borderRadius: 26,
+  padding: 16,
   color: "#5A3827",
-  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+  boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
   cursor: "pointer",
   textAlign: "center",
 },
 
 homeCategoryIcon: {
-  width: 58,
-  height: 58,
-  margin: "0 auto 8px",
-  borderRadius: 20,
+  width: 64,
+  height: 64,
+  margin: "0 auto 10px",
+  borderRadius: 22,
   background: "#FFF1D1",
   border: "1.5px solid #E8CFA3",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  fontSize: 32,
+  boxShadow: "0 6px 14px rgba(90,56,39,0.08)",
 },
 
 homeCategoryLabel: {
-  fontSize: 12,
-  fontWeight: 700,
+  fontSize: 13,
+  fontWeight: 800,
   lineHeight: 1.25,
 },
 
 todayPlanCard: {
   background: "#FFF9EA",
   border: "1.5px solid #E8CFA3",
-  borderRadius: 22,
-  padding: 14,
-  marginBottom: 16,
-  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+  borderRadius: 26,
+  padding: 16,
+  marginBottom: 18,
+  boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
 },
 
 todayFeaturedMeal: {
@@ -1336,17 +1330,17 @@ homeBottomGrid: {
 weeklyBudgetMiniCard: {
   background: "#FFF9EA",
   border: "1.5px solid #E8CFA3",
-  borderRadius: 22,
-  padding: 14,
-  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+  borderRadius: 26,
+  padding: 16,
+  boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
 },
 
 recommendCard: {
   background: "#FFF9EA",
   border: "1.5px solid #E8CFA3",
-  borderRadius: 22,
-  padding: 14,
-  boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
+  borderRadius: 26,
+  padding: 16,
+  boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
 },
 
 cardMiniTitle: {
@@ -1437,8 +1431,24 @@ card: {
   boxShadow: "4px 4px 0 rgba(90,56,39,0.10)",
 },
   homeHeader: { marginBottom: 24, paddingTop: 8 },
-  homeEyebrow: { fontSize: 11, color: "#7c8a64", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 4 },
-  homeLogo: { fontSize: 30, fontWeight: 700, letterSpacing: "0.01em", lineHeight: 1, color: "#2f2a24" },
+  homeEyebrow: {
+  fontSize: 12,
+  color: "#9A7A5A",
+  letterSpacing: "0.01em",
+  marginBottom: 6,
+  fontWeight: 700,
+},
+screen: {
+  padding: "18px 18px 0",
+},
+  homeLogo: {
+  fontSize: 28,
+  fontWeight: 800,
+  letterSpacing: "-0.04em",
+  lineHeight: 1,
+  color: "#5A3827",
+},
+
   homeTagline: { fontSize: 13, color: "#8b7d6b", marginTop: 5, fontStyle: "italic" },
   budgetRingCard: { background: "#fff8ea", borderRadius: 20, padding: 20, display: "flex", alignItems: "center", gap: 20, marginBottom: 24, border: "1.5px solid #c9b99a", boxShadow: "4px 4px 0 rgba(79,70,55,0.10)" },
   ringOuter: { flexShrink: 0 },
@@ -1446,7 +1456,13 @@ card: {
   ringLabel: { fontSize: 11, color: "#8b7d6b", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 6 },
   ringAmount: { fontSize: 20, fontWeight: 700, color: "#7c8a64" },
   ringMeta: { fontSize: 12, color: "#8b7d6b", marginTop: 4 },
-  sectionLabel: { fontSize: 10, fontWeight: 700, color: "#7c8a64", textTransform: "uppercase", letterSpacing: "0.18em", marginBottom: 10, marginTop: 4 },
+ sectionLabel: {
+  fontSize: 13,
+  fontWeight: 800,
+  color: "#5A3827",
+  marginBottom: 10,
+  marginTop: 4,
+},
   macroStrip: { display: "flex", gap: 8, marginBottom: 24 },
   macroChip: { flex: 1, background: "#fff8ea", border: "1.5px solid #c9b99a", borderRadius: 14, padding: "10px 6px", textAlign: "center", boxShadow: "2px 2px 0 rgba(79,70,55,0.08)" },
   macroVal: { fontSize: 16, fontWeight: 700 },
@@ -1460,7 +1476,12 @@ card: {
   todayRowMeta: { fontSize: 12, color: "#8b7d6b", marginTop: 2, fontStyle: "italic" },
   emptyState: { textAlign: "center", color: "#8b7d6b", padding: "24px 0", fontSize: 13, marginBottom: 24, fontStyle: "italic" },
   pageHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, paddingTop: 8 },
-  pageTitle: { fontSize: 24, fontWeight: 700, letterSpacing: "0.01em", color: "#2f2a24" },
+  pageTitle: {
+  fontSize: 28,
+  fontWeight: 900,
+  letterSpacing: "-0.04em",
+  color: "#5A3827",
+},
 newRecipeBtn: {
   background: "#0B5A3C",
   border: "1.5px solid #073C29",
@@ -1522,6 +1543,17 @@ categoryCardActive: {
 },
 
 categoryIconBubble: {
+  width: 56,
+  height: 56,
+  margin: "0 auto 8px",
+  borderRadius: 18,
+  background: "#FFF6DF",
+  border: "1.5px solid #E8CFA3",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "2px 2px 0 rgba(90,56,39,0.08)",
+},conBubble: {
   width: 46,
   height: 46,
   margin: "0 auto 8px",
