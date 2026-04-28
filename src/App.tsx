@@ -582,6 +582,31 @@ function applyRecommendedBudget() {
               ))}
             </div>
             <div style={{ height: 40 }} />
+         <nav style={s.bottomNav}>
+  {(["home", "recipes", "planner", "budget", "insights"] as Screen[]).map((sc) => {
+    const icons: Record<Screen, string> = {
+      home: "⌂",
+      recipes: "◈",
+      planner: "▦",
+      budget: "◎",
+      insights: "✦",
+    };
+
+    return (
+      <button
+        key={sc}
+        style={{
+          ...s.bottomNavBtn,
+          ...(screen === sc ? s.bottomNavBtnActive : {}),
+        }}
+        onClick={() => setScreen(sc)}
+      >
+        <span style={s.bottomNavIcon}>{icons[sc]}</span>
+        <span style={s.bottomNavLabel}>{sc}</span>
+      </button>
+    );
+  })}
+</nav>
           </div>
         </div>
       </div>
@@ -591,13 +616,7 @@ function applyRecommendedBudget() {
   return (
     <div style={s.shell}>
       <div style={s.statusBar} />
-      <nav style={s.topNav}>
-        {(["home", "recipes", "planner", "budget", "insights"] as Screen[]).map((sc) => (
-          <button key={sc} style={{ ...s.topNavBtn, ...(screen === sc ? s.topNavBtnActive : {}) }} onClick={() => setScreen(sc)}>
-            {sc.charAt(0).toUpperCase() + sc.slice(1)}
-          </button>
-        ))}
-      </nav>
+      
       <div style={s.screenWrap}>
 
         {/* ── HOME ── */}
@@ -1517,6 +1536,49 @@ viewRecipeButton: {
   fontSize: 12,
   fontWeight: 700,
   cursor: "pointer",
+},
+bottomNav: {
+  position: "sticky",
+  bottom: 12,
+  margin: "0 14px 12px",
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 26,
+  boxShadow: "0 12px 28px rgba(90,56,39,0.16)",
+  padding: "8px 8px",
+  display: "grid",
+  gridTemplateColumns: "repeat(5, 1fr)",
+  gap: 4,
+  zIndex: 20,
+},
+
+bottomNavBtn: {
+  border: "none",
+  background: "transparent",
+  borderRadius: 18,
+  padding: "8px 4px",
+  color: "#9A7A5A",
+  cursor: "pointer",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 3,
+  fontWeight: 800,
+},
+
+bottomNavBtnActive: {
+  background: "#FFE7C2",
+  color: "#0B5A3C",
+},
+
+bottomNavIcon: {
+  fontSize: 17,
+  lineHeight: 1,
+},
+
+bottomNavLabel: {
+  fontSize: 9,
+  textTransform: "capitalize",
 },
 topNav: {
   display: "flex",
