@@ -603,7 +603,9 @@ function applyRecommendedBudget() {
         {/* ── HOME ── */}
 {screen === "home" && (
   <div style={s.screen}>
-    <div style={s.homeHeroCard}>
+    <div style={{ ...s.homeHeroCard, ...s.stationeryPanel }}>
+  <div style={s.paperTape} />
+  <div style={s.cornerFlower}>✿</div>
       <div style={s.homeTopRow}>
         <div>
           <div style={s.homeEyebrow}>Good morning,</div>
@@ -654,7 +656,7 @@ function applyRecommendedBudget() {
         ["Snacks & Treats", "🍫"],
         ["Beverages", "🧋"],
       ].map(([label, icon]) => (
-        <button key={label} style={s.homeCategoryCard} onClick={() => setScreen("recipes")}>
+        <button key={label} style={{ ...s.homeCategoryCard, ...s.stationeryPanel }}onClick={() => setScreen("recipes")}>
           <div style={s.homeCategoryIcon}>
   <FoodIcon type={label} />
 </div>
@@ -1208,7 +1210,42 @@ homeHeroCard: {
   marginBottom: 20,
   boxShadow: "0 10px 24px rgba(90,56,39,0.08)",
 },
+stationeryPanel: {
+  position: "relative",
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 30,
+  boxShadow: "0 14px 30px rgba(90,56,39,0.10)",
+  overflow: "hidden",
+},
 
+paperTape: {
+  position: "absolute",
+  top: -8,
+  left: 24,
+  width: 80,
+  height: 22,
+  background: "rgba(248,200,184,0.72)",
+  borderRadius: 8,
+  transform: "rotate(-3deg)",
+},
+
+cornerFlower: {
+  position: "absolute",
+  right: 14,
+  top: 12,
+  fontSize: 22,
+  opacity: 0.7,
+},
+
+doodleDots: {
+  position: "absolute",
+  inset: 0,
+  backgroundImage:
+    "radial-gradient(rgba(90,56,39,0.08) 1px, transparent 1px)",
+  backgroundSize: "14px 14px",
+  pointerEvents: "none",
+},
 homeTopRow: {
   display: "flex",
   justifyContent: "space-between",
