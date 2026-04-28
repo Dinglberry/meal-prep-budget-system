@@ -420,10 +420,10 @@ export default function App() {
       src={img}
       alt="Glow Kitchen hero"
       style={{
-        width: "95%",
-        height: "95%",
+        width: "90%",
+        height: "90%",
         objectFit: "cover",
-        objectPosition: "center top",
+        objectPosition: "center",
         display: "block",
       }}
     />
