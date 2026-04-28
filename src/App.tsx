@@ -1538,20 +1538,23 @@ viewRecipeButton: {
   cursor: "pointer",
 },
 bottomNav: {
-  position: "sticky",
-  bottom: 12,
-  margin: "0 14px 12px",
-  background: "#FFF9EA",
+  position: "fixed",
+  left: "50%",
+  bottom: 16,
+  transform: "translateX(-50%)",
+  width: "calc(100% - 32px)",
+  maxWidth: 398,
+  background: "rgba(255, 249, 234, 0.94)",
   border: "1.5px solid #E8CFA3",
   borderRadius: 26,
-  boxShadow: "0 12px 28px rgba(90,56,39,0.16)",
+  boxShadow: "0 12px 28px rgba(90,56,39,0.18)",
   padding: "8px 8px",
   display: "grid",
   gridTemplateColumns: "repeat(5, 1fr)",
   gap: 4,
-  zIndex: 20,
+  zIndex: 999,
+  backdropFilter: "blur(10px)",
 },
-
 bottomNavBtn: {
   border: "none",
   background: "transparent",
@@ -1580,6 +1583,7 @@ bottomNavLabel: {
   fontSize: 9,
   textTransform: "capitalize",
 },
+
 topNav: {
   display: "flex",
   borderBottom: "1.5px solid #E8CFA3",
@@ -1609,6 +1613,12 @@ card: {
 },
 screen: {
   padding: "18px 18px 0",
+},
+screenWrap: {
+  flex: 1,
+  overflowY: "auto",
+  overflowX: "hidden",
+  paddingBottom: 110,
 },
   homeLogo: {
   fontSize: 28,
