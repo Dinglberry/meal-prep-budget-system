@@ -410,7 +410,7 @@ export default function App() {
                 {/* Decorative elements mimicking the illustrated style */}
                 {(() => {
   const heroes = Array.from({ length: 36 }, (_, i) =>
-    `/meal-prep-budget-system/heroes/single/hero-${String(i + 1).padStart(2, "0")}.jpg`
+    `/meal-prep-budget-system/heroes/ready/hero-${String(i + 1).padStart(2, "0")}.jpg`
   );
 
   const img = heroes[Math.floor(Math.random() * heroes.length)];
