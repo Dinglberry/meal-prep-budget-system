@@ -408,17 +408,28 @@ export default function App() {
               {/* Illustrated background with gradient */}
               <div style={s.heroIllustration}>
                 {/* Decorative elements mimicking the illustrated style */}
-                <img
-  src="/meal-prep-budget-system/heroes/h1.png"
-  alt="Glow Kitchen hero"
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    objectPosition: "center",
-    display: "block",
-  }}
-/>
+                {(() => {
+  const heroes = Array.from({ length: 36 }, (_, i) =>
+    `/meal-prep-budget-system/heroes/single/hero-${String(i + 1).padStart(2, "0")}.jpg`
+  );
+
+  const img = heroes[Math.floor(Math.random() * heroes.length)];
+
+  return (
+    <img
+      src={img}
+      alt="Glow Kitchen hero"
+      style={{
+        width: "100%",
+        height: "100%",
+        objectFit: "cover",
+        objectPosition: "center",
+        display: "block",
+      }}
+    />
+  );
+})()}
+
               </div>
             </div>
 
