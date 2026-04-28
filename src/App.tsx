@@ -421,13 +421,12 @@ export default function App() {
                         src={`/meal-prep-budget-system/heroes/${img}`}
                         alt="hero"
                         style={{
-                          width: `${cols * 100}%`,
-                          height: `${rows * 100}%`,
-                          position: "absolute",
-                          top: `${-(row / rows) * 100}%`,
-                          left: `${-(col / cols) * 100}%`,
-                          objectFit: "fill",
-                        }}
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+  objectPosition: "center",
+  display: "block",
+}}
                       />
                       <div style={{ position:"absolute", top:16, left:14, background:"rgba(255,255,255,0.92)", borderRadius:16, padding:"12px 16px", maxWidth:170, boxShadow:"0 4px 16px rgba(0,0,0,0.10)", zIndex:2 }}>
                         <div style={{ fontSize:13, fontWeight:600, color:"#3a3228", lineHeight:1.4 }}>Let's plan something<br/>healthy and delicious!</div>
