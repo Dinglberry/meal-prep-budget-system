@@ -732,7 +732,7 @@ const groceryCategoryItems: Record<string, string[]> = {
     {groceryCategoryItems[groceryTab].map((food) => (
       <button
         key={food}
-        style={s.groceryCatChip}
+        style={s.foodItemCard}
         onClick={() =>
           addItem({
             id: food.toLowerCase().replace(/\s+/g, "-"),
@@ -1096,6 +1096,18 @@ groceryCategoryLabel: {
   color: "#5A3827",
   textAlign: "center" as const,
   lineHeight: 1.2,
+},
+foodItemCard: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 18,
+  padding: "10px 14px",
+  color: "#5A3827",
+  fontSize: 12,
+  fontWeight: 800,
+  cursor: "pointer",
+  boxShadow: "0 6px 14px rgba(90,56,39,0.08)",
+  whiteSpace: "nowrap",
 },
   // Insights
   insightSection: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
