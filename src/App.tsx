@@ -473,7 +473,17 @@ const groceryCategoryItems: Record<string, string[]> = {
         ) : (
           todaySlots.slice(0, 3).map(({ slot, recipe }) => recipe && (
             <div key={slot} style={s.todayRow}>
-              <div style={s.todayFoodImg}>{FOOD_CATEGORY_EMOJI[recipe.category] || "🍽"}</div>
+              <img
+  src={
+    recipe.category === "Breakfast"
+      ? "https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/6f8b93e33_generated_image.png"
+      : recipe.category === "Bowls"
+      ? "https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/53cb2cb8d_generated_image.png"
+      : "https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/f4a62fce4_generated_image.png"
+  }
+  alt={recipe.name}
+  style={s.todayFoodArt}
+/>
               <div style={s.todayInfo}>
                 <div style={s.todayName}>{recipe.name}</div>
                 <div style={s.todayMeta}>
@@ -961,7 +971,13 @@ const s: Record<string, React.CSSProperties> = {
   quickActionEmoji: { fontSize: 24, marginBottom: 6 },
   quickActionLabel: { fontSize: 11, fontWeight: 600, color: "#3a3228" },
   todayCard: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
-  todayRow: { display: "flex", alignItems: "center", gap: 12, paddingBottom: 12, borderBottom: "1px solid #f4efe3", marginBottom: 12 },
+  todayRow: {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  padding: "12px 0",
+  borderBottom: "1px solid #f0ebe0",
+},
   todayEmoji: { fontSize: 28, flexShrink: 0 },
   todayInfo: { flex: 1 },
   todayName: { fontSize: 14, fontWeight: 600, color: "#3a3228" },
@@ -1152,6 +1168,15 @@ viewListButton: {
   marginBottom: 16,
   cursor: "pointer",
   boxShadow: "0 10px 22px rgba(90,56,39,0.10)",
+},
+todayFoodArt: {
+  width: 62,
+  height: 62,
+  borderRadius: 18,
+  objectFit: "cover",
+  background: "#FFF6DF",
+  border: "1.5px solid #E8CFA3",
+  flexShrink: 0,
 },
   // Insights
   insightSection: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
