@@ -541,7 +541,10 @@ const groceryCategoryItems: Record<string, string[]> = {
         {screen === "recipes" && (
           <div style={s.screen}>
             <div style={s.pageHeader}>
-              <div style={s.pageTitle}>Recipes 🍽</div>
+              <div>
+  <div style={s.heroGreeting}>Your kitchen library</div>
+  <div style={s.pageTitle}>Recipes 🍽️</div>
+</div>
               <button style={s.pillBtn} onClick={openNewRecipe}>+ New</button>
             </div>
 
@@ -1014,7 +1017,13 @@ const s: Record<string, React.CSSProperties> = {
   planStripLabel: { fontSize: 12, color: "#8b7d6b", flexShrink: 0 },
   miniSelect: { background: "#faf6ee", border: "1px solid #e8e0d0", borderRadius: 8, padding: "5px 10px", color: "#3a3228", fontSize: 12, cursor: "pointer" },
   recipeGrid: { display: "flex", flexDirection: "column", gap: 10 },
-  recipeCard: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" },
+  recipeCard: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 24,
+  overflow: "hidden",
+  boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
+},
   recipeCardHeader: { display: "flex", alignItems: "center", padding: "14px 16px", width: "100%", background: "transparent", border: "none", color: "#3a3228", cursor: "pointer", textAlign: "left", gap: 12 },
   recipeEmojiBig: { fontSize: 32, flexShrink: 0 },
   recipeCardBody: { flex: 1 },
