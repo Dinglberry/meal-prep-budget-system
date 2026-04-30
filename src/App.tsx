@@ -711,14 +711,10 @@ const groceryCategoryItems: Record<string, string[]> = {
   ].map((cat) => (
     <button
       key={cat}
-      style={s.groceryCatChip}
-      onClick={() => {
-        if (cat === "List") {
-          setScreen("list");
-        } else {
-          setGroceryTab(cat);
-        }
-      }}
+      style={{
+  ...s.groceryCatChip,
+  ...(groceryTab === cat ? s.groceryCatChipActive : {}),
+}}
     >
       {cat}
     </button>
@@ -1049,6 +1045,11 @@ const s: Record<string, React.CSSProperties> = {
   groceryCostInput: { width: 54, background: "transparent", border: "none", color: "#3a3228", fontSize: 16, fontWeight: 700, textAlign: "right" as const, outline: "none" },
   groceryDeleteBtn: { background: "transparent", border: "none", color: "#c9b99a", fontSize: 14, cursor: "pointer", padding: "2px 4px" },
   addGroceryBtn: { width: "100%", background: "#7c8a64", border: "none", borderRadius: 14, padding: "13px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 16 },
+  groceryCatChipActive: {
+  background: "#7c8a64",
+  color: "#fff8ea",
+  border: "1px solid #7c8a64",
+},
 
   // Insights
   insightSection: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
