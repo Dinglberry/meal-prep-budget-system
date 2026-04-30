@@ -55,7 +55,7 @@ type EditableGrocery = { name: string; category: string; uses: number; estimated
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
-  const { addItem } = useShoppingList();
+  const { items, addItem } = useShoppingList();
   const [recipePasteText, setRecipePasteText] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
@@ -734,7 +734,9 @@ const groceryCategoryItems: Record<string, string[]> = {
           })
         }
       >
-        + {food}
+        {items.some((item) => item.id === food.toLowerCase().replace(/\s+/g, "-"))
+  ? `✓ ${food}`
+  : `+ ${food}`}
       </button>
     ))}
   </div>
