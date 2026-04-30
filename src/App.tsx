@@ -56,7 +56,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const { items, addItem } = useShoppingList();
-  const [groceryTab, setGroceryTab] = useState("All");
+  
   const [recipePasteText, setRecipePasteText] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
@@ -442,13 +442,27 @@ const groceryCategoryItems: Record<string, string[]> = {
       <button style={s.heroBellButton}>♡</button>
     </div>
 
-    <div style={s.heroImageFrame}>
-      <img
-        src="https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/40dec8fb1_generated_image.png"
-        alt="Glow Kitchen hero"
-        style={s.heroImage}
-      />
-    </div>
+   <div
+  style={{
+    margin: "8px 16px 0",
+    borderRadius: 22,
+    overflow: "hidden",
+    background: "#FFF6DF",
+    boxShadow: "0 8px 18px rgba(90,56,39,0.12)",
+  }}
+>
+  <img
+    src="https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/40dec8fb1_generated_image.png"
+    alt="Glow Kitchen hero"
+    style={{
+      width: "100%",
+      height: 260,
+      objectFit: "cover",
+      objectPosition: "center",
+      display: "block",
+    }}
+  />
+</div>
 
     <div style={s.homeContent}>
       <div style={s.sectionTitle}>Quick Actions</div>
