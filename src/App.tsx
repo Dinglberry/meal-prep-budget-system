@@ -13,7 +13,7 @@ import { recipes as initialRecipes } from "./data/recipes";
 import { defaultPlan } from "./data/plan";
 import ListView from "./components/ListView";
 import { useShoppingList } from "./lib/shoppingList";
-const [groceryTab, setGroceryTab] = useState("All");
+
 
 const WEEKLY_BUDGET_DEFAULT = 50;
 const MAX_RECIPES = 50;
@@ -56,6 +56,7 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
   const { items, addItem } = useShoppingList();
+  const [groceryTab, setGroceryTab] = useState("All");
   const [recipePasteText, setRecipePasteText] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
