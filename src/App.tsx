@@ -727,6 +727,9 @@ const groceryCategoryItems: Record<string, string[]> = {
   </button>
 ))}
 </div>
+<button style={s.viewListButton} onClick={() => setScreen("list")}>
+  View Shopping List · {items.filter((item) => !item.bought).length} items
+</button>
 {groceryTab !== "All" && groceryCategoryItems[groceryTab] && (
   <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 16 }}>
     {groceryCategoryItems[groceryTab].map((food) => (
@@ -1118,6 +1121,19 @@ foodItemCard: {
   cursor: "pointer",
   boxShadow: "0 6px 14px rgba(90,56,39,0.08)",
   whiteSpace: "nowrap",
+},
+viewListButton: {
+  width: "100%",
+  background: "#7c8a64",
+  border: "none",
+  borderRadius: 18,
+  padding: "12px 14px",
+  color: "#fff8ea",
+  fontSize: 13,
+  fontWeight: 900,
+  marginBottom: 16,
+  cursor: "pointer",
+  boxShadow: "0 10px 22px rgba(90,56,39,0.10)",
 },
   // Insights
   insightSection: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
