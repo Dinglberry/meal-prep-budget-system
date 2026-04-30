@@ -399,14 +399,32 @@ const groceryCategoryItems: Record<string, string[]> = {
 
       {/* ── BOTTOM NAV ── */}
       <nav style={s.bottomNav}>
-        {([["home", "🏠", "Home"], ["planner", "📅", "Plan"], ["recipes", "🍽", "Recipes"], ["budget", "🛒", "Groceries"], ["list", "🛒", "List"] ["insights", "📊", "Profile"]] as [Screen, string, string][]).map(([sc, emoji, label]) => (
-          <button key={sc} style={{ ...s.navBtn, ...(screen === sc ? s.navBtnActive : {}) }} onClick={() => setScreen(sc)}>
-            <span style={s.navEmoji}>{emoji}</span>
-            <span style={{ ...s.navLabel, ...(screen === sc ? { color: "#7c8a64", fontWeight: 700 } : {}) }}>{label}</span>
-            {screen === sc && <div style={s.navDot} />}
-          </button>
-        ))}
-      </nav>
+  {([
+    ["home", "🏠", "Home"],
+    ["planner", "📅", "Plan"],
+    ["recipes", "🍽", "Recipes"],
+    ["budget", "🛒", "Groceries"],
+    ["list", "🧺", `List ${items.filter((item) => !item.bought).length}`],
+    ["insights", "📊", "Profile"],
+  ] as [Screen, string, string][]).map(([sc, emoji, label]) => (
+    <button
+      key={sc}
+      style={{ ...s.navBtn, ...(screen === sc ? s.navBtnActive : {}) }}
+      onClick={() => setScreen(sc)}
+    >
+      <span style={s.navEmoji}>{emoji}</span>
+      <span
+        style={{
+          ...s.navLabel,
+          ...(screen === sc ? { color: "#7c8a64", fontWeight: 700 } : {}),
+        }}
+      >
+        {label}
+      </span>
+      {screen === sc && <div style={s.navDot} />}
+    </button>
+  ))}
+</nav>
 
       <div style={s.screenWrap}>
 
