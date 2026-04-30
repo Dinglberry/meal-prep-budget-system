@@ -834,7 +834,10 @@ const groceryCategoryItems: Record<string, string[]> = {
         {/* ── INSIGHTS / PROFILE ── */}
         {screen === "insights" && (
           <div style={s.screen}>
-            <div style={s.pageHeader}><div style={s.pageTitle}>Profile & Insights 📊</div></div>
+           <div>
+  <div style={s.heroGreeting}>Your progress</div>
+  <div style={s.pageTitle}>Profile 📊</div>
+</div>
 
             {/* Profile */}
             <div style={s.insightSection}>
@@ -1204,8 +1207,15 @@ todayFoodArt: {
   flexShrink: 0,
 },
   // Insights
-  insightSection: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
+  
   insightSectionTitle: { fontSize: 14, fontWeight: 700, color: "#3a3228", marginBottom: 12 },
+  insightCard: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 24,
+  padding: "18px",
+  boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
+},
   profileGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 },
   profileBox: { background: "#faf6ee", borderRadius: 12, padding: "10px 12px" },
   profileBoxLabel: { fontSize: 10, color: "#8b7d6b", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 },
