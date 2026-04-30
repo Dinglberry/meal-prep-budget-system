@@ -836,7 +836,6 @@ todayFoodArt: {
   flexShrink: 0,
 },
   quickGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 8 },
- quickActionBtn: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 18, padding: "14px 6px 10px", textAlign: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" },
 quickActionBtn: {
   background: "#FFF9EA",
   border: "1.5px solid #E8CFA3",
