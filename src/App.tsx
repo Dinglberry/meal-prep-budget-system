@@ -438,7 +438,11 @@ export default function App() {
       </div>
     );
   }
-
+<img
+  src="https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/40dec8fb1_generated_image.png"
+  alt={recipe.name}
+  style={s.todayFoodArt}
+/>
   return (
     <div style={s.shell}>
       {/* TOP BAR */}
@@ -495,6 +499,7 @@ export default function App() {
                   </button>
                 ))}
               </div>
+              
 
               {/* Today's Plan */}
               <div style={s.sectionTitle}>Today's Plan</div>
@@ -821,8 +826,30 @@ const s: Record<string, React.CSSProperties> = {
   marginBottom: 12,
   marginTop: 20,
 },
+todayFoodArt: {
+  width: 60,
+  height: 60,
+  borderRadius: 18,
+  objectFit: "cover",
+  border: "1.5px solid #E8CFA3",
+  background: "#FFF6DF",
+  flexShrink: 0,
+},
   quickGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 8 },
-  quickBtn: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 18, padding: "14px 6px 10px", textAlign: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" },
+ quickActionBtn: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 18, padding: "14px 6px 10px", textAlign: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" },
+quickActionBtn: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 22,
+  padding: "14px 8px",
+  minHeight: 118,
+  display: "flex",
+  flexDirection: "column" as const,
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+  boxShadow: "0 8px 18px rgba(90,56,39,0.08)",
+},
   quickIcon: { fontSize: 28, marginBottom: 6, height: 36, display: "flex", alignItems: "center", justifyContent: "center" },
   quickLabel: { fontSize: 11, fontWeight: 600, color: "#3a3228" },
   todayCard: { background: "#fff", borderRadius: 18, padding: "6px 0", boxShadow: "0 2px 10px rgba(0,0,0,0.05)", marginBottom: 16 },
