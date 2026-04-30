@@ -701,7 +701,12 @@ const groceryCategoryItems: Record<string, string[]> = {
         {/* ── BUDGET / GROCERIES ── */}
         {screen === "budget" && (
           <div style={s.screen}>
-            <div style={s.pageHeader}><div style={s.pageTitle}>Groceries 🛒</div></div>
+           <div style={s.pageHeader}>
+  <div>
+    <div style={s.heroGreeting}>Shop your plan</div>
+    <div style={s.pageTitle}>Groceries 🛒</div>
+  </div>
+</div>
 
             {/* Budget card */}
             <div style={s.budgetSummaryCard}>
