@@ -399,102 +399,105 @@ export default function App() {
 
       <div style={s.screenWrap}>
 
-        {/* ── HOME ── */}
-        {screen === "home" && (
-          <div style={{ ...s.screen, padding: 0 }}>
+       {/* ── HOME ── */}
+{screen === "home" && (
+  <div style={{ ...s.screen, padding: 0 }}>
+    <div style={s.heroHeader}>
+      <div>
+        <p style={s.heroGreeting}>Good morning,</p>
+        <h1 style={s.heroTitle}>
+          Glow Kitchen <span style={s.heroLeaf}>🌿</span>
+        </h1>
+      </div>
+      <button style={s.heroBellButton}>♡</button>
+    </div>
 
-            {/* Hero illustration area */}
-            <div style={s.heroWrap}>
-              {/* Illustrated background with gradient */}
-              <div style={s.heroIllustration}>
-                {/* Decorative elements mimicking the illustrated style */}
-                {(() => {
-  const heroes = Array.from({ length: 32 }, (_, i) =>
-    `/meal-prep-budget-system/heroes/custom/hero-${String(i + 1).padStart(2, "0")}.png`
-  );
+    <div style={s.heroImageFrame}>
+      <img
+        src="https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/40dec8fb1_generated_image.png"
+        alt="Glow Kitchen hero"
+        style={s.heroImage}
+      />
+    </div>
 
-  const img = heroes[Math.floor(Math.random() * heroes.length)];
+    <div style={s.homeContent}>
+      <div style={s.sectionTitle}>Quick Actions</div>
 
-  return (
-    <img
-      src={img}
-      alt="Glow Kitchen hero"
-      style={{
-        width: "100%",
-        height: "88%",
-        objectFit: "cover",
-        objectPosition: "center top",
-        display: "block",
-      }}
-    />
-  );
-})()}
+      <div style={s.quickActionGrid}>
+        {([
+          ["planner", "https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/78235ac15_generated_image.png", "Meal Plan"],
+          ["budget", "https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/927aa8639_generated_image.png", "Groceries"],
+          ["recipes", "https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/adba70ce8_generated_image.png", "Recipes"],
+          ["insights", "https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/b300fa93d_generated_image.png", "Budget"],
+        ] as [Screen, string, string][]).map(([sc, img, label]) => (
+          <button key={sc} style={s.quickActionBtn} onClick={() => setScreen(sc)}>
+            <img src={img} alt={label} style={s.quickActionImg} />
+            <div style={s.quickActionLabel}>{label}</div>
+          </button>
+        ))}
+      </div>
 
-              </div>
-            </div>
-
-            <div style={s.homeContent}>
-              {/* Quick Actions */}
-              <div style={s.sectionTitle}>Quick Actions</div>
-              <div style={s.quickActionGrid}>
-                {([
-                  ["planner", "🗓", "Meal Plan"],
-                  ["budget", "🧺", "Groceries"],
-                  ["recipes", "👨‍🍳", "Recipes"],
-                  ["insights", "🐷", "Budget"],
-                ] as [Screen, string, string][]).map(([sc, emoji, label]) => (
-                  <button key={sc} style={s.quickActionBtn} onClick={() => setScreen(sc)}>
-                    <div style={s.quickActionIcon}>
-                      <span style={s.quickActionEmoji}>{emoji}</span>
-                    </div>
-                    <div style={s.quickActionLabel}>{label}</div>
-                  </button>
-                ))}
-              </div>
-
-              {/* Today's Plan */}
-              <div style={s.sectionTitle}>Today's Plan</div>
-              <div style={s.todayCard}>
-                {todaySlots.length === 0 ? (
-                  <div style={s.emptyState}>No meals planned yet — go to Plan! 🌱</div>
-                ) : (
-                  todaySlots.slice(0, 3).map(({ slot, recipe }) => recipe && (
-                    <div key={slot} style={s.todayRow}>
-                      <div style={s.todayFoodImg}>{FOOD_CATEGORY_EMOJI[recipe.category] || "🍽"}</div>
-                      <div style={s.todayInfo}>
-                        <div style={s.todayName}>{recipe.name}</div>
-                        <div style={s.todayMeta}>with {recipe.ingredients.slice(0,2).map(i => i.item).join(", ") || "fresh ingredients"}</div>
-                      </div>
-                      <button style={s.heartBtn}>🤍</button>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Budget mini */}
-              <div style={s.sectionTitle}>Weekly Budget</div>
-              <div style={s.budgetMiniCard}>
-                <div style={s.budgetMiniLeft}>
-                  <svg width="64" height="64" viewBox="0 0 64 64">
-                    <circle cx="32" cy="32" r="26" fill="none" stroke="#f0ebe0" strokeWidth="7" />
-                    <circle cx="32" cy="32" r="26" fill="none" stroke="#7c8a64" strokeWidth="7"
-                      strokeDasharray={`${budgetPercent * 1.634} 163.4`} strokeLinecap="round" transform="rotate(-90 32 32)" />
-                  </svg>
-                  <div style={s.budgetMiniText}>
-                    <div style={s.budgetMiniAmount}>{currency(editableTotal)}</div>
-                    <div style={s.budgetMiniSub}>of {currency(budgetTarget)}</div>
-                    <div style={s.budgetMiniPct}>{budgetPercent}% of weekly budget</div>
-                  </div>
-                </div>
-                <div style={s.budgetMiniItems}>
-                  <div style={s.budgetMiniRow}><span style={{ ...s.budgetDot, background: "#7c8a64" }} /><span>Groceries</span><span style={s.budgetMiniVal}>{currency(editableTotal)}</span></div>
-                  <div style={s.budgetMiniRow}><span style={{ ...s.budgetDot, background: "#e8c9a0" }} /><span>Left</span><span style={s.budgetMiniVal}>{currency(Math.max(0, budgetRemaining))}</span></div>
+      <div style={s.sectionTitle}>Today&apos;s Plan</div>
+      <div style={s.todayCard}>
+        {todaySlots.length === 0 ? (
+          <div style={s.emptyState}>No meals planned yet — go to Plan! 🌱</div>
+        ) : (
+          todaySlots.slice(0, 3).map(({ slot, recipe }) => recipe && (
+            <div key={slot} style={s.todayRow}>
+              <div style={s.todayFoodImg}>{FOOD_CATEGORY_EMOJI[recipe.category] || "🍽"}</div>
+              <div style={s.todayInfo}>
+                <div style={s.todayName}>{recipe.name}</div>
+                <div style={s.todayMeta}>
+                  with {recipe.ingredients.slice(0, 2).map((i) => i.item).join(", ") || "fresh ingredients"}
                 </div>
               </div>
+              <button style={s.heartBtn}>♡</button>
             </div>
-          </div>
+          ))
         )}
+      </div>
 
+      <div style={s.sectionTitle}>Weekly Budget</div>
+      <div style={s.budgetMiniCard}>
+        <div style={s.budgetMiniLeft}>
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#F0EBE0" strokeWidth="7" />
+            <circle
+              cx="32"
+              cy="32"
+              r="26"
+              fill="none"
+              stroke="#7C8A64"
+              strokeWidth="7"
+              strokeDasharray={`${budgetPercent * 1.634} 163.4`}
+              strokeLinecap="round"
+              transform="rotate(-90 32 32)"
+            />
+          </svg>
+
+          <div style={s.budgetMiniText}>
+            <div style={s.budgetMiniAmount}>{currency(editableTotal)}</div>
+            <div style={s.budgetMiniSub}>of {currency(budgetTarget)}</div>
+            <div style={s.budgetMiniPct}>{budgetPercent}% of weekly budget</div>
+          </div>
+        </div>
+
+        <div style={s.budgetMiniItems}>
+          <div style={s.budgetMiniRow}>
+            <span style={{ ...s.budgetDot, background: "#7C8A64" }} />
+            <span>Groceries</span>
+            <span style={s.budgetMiniVal}>{currency(editableTotal)}</span>
+          </div>
+          <div style={s.budgetMiniRow}>
+            <span style={{ ...s.budgetDot, background: "#E8C9A0" }} />
+            <span>Left</span>
+            <span style={s.budgetMiniVal}>{currency(Math.max(0, budgetRemaining))}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
         {/* ── RECIPES ── */}
         {screen === "recipes" && (
           <div style={s.screen}>
