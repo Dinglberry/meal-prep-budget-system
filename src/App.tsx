@@ -814,7 +814,13 @@ const s: Record<string, React.CSSProperties> = {
   heroDotActive: { background: "#fff", width: 18 },
 
   // Home
-  sectionTitle: { fontSize: 15, fontWeight: 700, color: "#3a3228", marginBottom: 12, marginTop: 16 },
+  sectionTitle: {
+  fontSize: 14,
+  fontWeight: 900,
+  color: "#5A3827",
+  marginBottom: 12,
+  marginTop: 20,
+},
   quickGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 8 },
   quickBtn: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 18, padding: "14px 6px 10px", textAlign: "center", cursor: "pointer", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" },
   quickIcon: { fontSize: 28, marginBottom: 6, height: 36, display: "flex", alignItems: "center", justifyContent: "center" },
