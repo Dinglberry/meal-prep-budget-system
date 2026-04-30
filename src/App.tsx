@@ -438,11 +438,7 @@ export default function App() {
       </div>
     );
   }
-<img
-  src="https://media.base44.com/images/public/69f2c6fa21f32c9cfaebac4e/40dec8fb1_generated_image.png"
-  alt={recipe.name}
-  style={s.todayFoodArt}
-/>
+
   return (
     <div style={s.shell}>
       {/* TOP BAR */}
