@@ -11,11 +11,12 @@ import {
 } from "./lib";
 import { recipes as initialRecipes } from "./data/recipes";
 import { defaultPlan } from "./data/plan";
+import ListView from "./components/ListView";
 
 const WEEKLY_BUDGET_DEFAULT = 50;
 const MAX_RECIPES = 50;
 type DayKey = keyof WeekPlan;
-type Screen = "home" | "recipes" | "planner" | "budget" | "insights";
+type Screen = "home" | "recipes" | "planner" | "budget" | "list";
 
 const FOOD_CATEGORY_EMOJI: Record<string, string> = {
   Breakfast: "🥣", Bowls: "🥙", Snacks: "🍎", Drinks: "🧃", Imported: "📋",
@@ -388,7 +389,7 @@ export default function App() {
 
       {/* ── BOTTOM NAV ── */}
       <nav style={s.bottomNav}>
-        {([["home", "🏠", "Home"], ["planner", "📅", "Plan"], ["recipes", "🍽", "Recipes"], ["budget", "🛒", "Groceries"], ["insights", "📊", "Profile"]] as [Screen, string, string][]).map(([sc, emoji, label]) => (
+        {([["home", "🏠", "Home"], ["planner", "📅", "Plan"], ["recipes", "🍽", "Recipes"], ["budget", "🛒", "Groceries"], ["list", "🛒", "List"] ["insights", "📊", "Profile"]] as [Screen, string, string][]).map(([sc, emoji, label]) => (
           <button key={sc} style={{ ...s.navBtn, ...(screen === sc ? s.navBtnActive : {}) }} onClick={() => setScreen(sc)}>
             <span style={s.navEmoji}>{emoji}</span>
             <span style={{ ...s.navLabel, ...(screen === sc ? { color: "#7c8a64", fontWeight: 700 } : {}) }}>{label}</span>
@@ -716,6 +717,8 @@ export default function App() {
             <button style={s.addGroceryBtn} onClick={addGroceryItem}>+ Add Item</button>
           </div>
         )}
+        {/* ── LIST ── */}
+{screen === "list" && <ListView />}
 
         {/* ── INSIGHTS / PROFILE ── */}
         {screen === "insights" && (
