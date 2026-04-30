@@ -12,6 +12,7 @@ import {
 import { recipes as initialRecipes } from "./data/recipes";
 import { defaultPlan } from "./data/plan";
 import ListView from "./components/ListView";
+import { useShoppingList } from "./lib/shoppingList";
 
 const WEEKLY_BUDGET_DEFAULT = 50;
 const MAX_RECIPES = 50;
@@ -53,6 +54,7 @@ type EditableGrocery = { name: string; category: string; uses: number; estimated
 export default function App() {
   const [screen, setScreen] = useState<Screen>("home");
   const [recipes, setRecipes] = useState<Recipe[]>(initialRecipes);
+  const { addItem } = useShoppingList();
   const [recipePasteText, setRecipePasteText] = useState("");
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string>(ALL_CATEGORIES);
@@ -710,6 +712,18 @@ export default function App() {
                       onChange={(e) => updateGrocery(i, "estimatedCost", e.target.value)}
                       onBlur={() => commitPrice(i)} placeholder="0.00" />
                   </div>
+                  <button
+  style={s.addToListBtn}
+  onClick={() =>
+    addItem({
+      id: item.name.toLowerCase().replace(/\s+/g, "-"),
+      name: item.name,
+      category: item.category,
+    })
+  }
+>
+  + List
+</button>
                   <button style={s.groceryDeleteBtn} onClick={() => deleteGroceryItem(i)}>✕</button>
                 </div>
               ))}
@@ -987,7 +1001,17 @@ const s: Record<string, React.CSSProperties> = {
   groceryCostInput: { width: 54, background: "transparent", border: "none", color: "#3a3228", fontSize: 16, fontWeight: 700, textAlign: "right" as const, outline: "none" },
   groceryDeleteBtn: { background: "transparent", border: "none", color: "#c9b99a", fontSize: 14, cursor: "pointer", padding: "2px 4px" },
   addGroceryBtn: { width: "100%", background: "#7c8a64", border: "none", borderRadius: 14, padding: "13px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", marginBottom: 16 },
-
+addToListBtn: {
+  background: "#7c8a64",
+  border: "none",
+  borderRadius: 999,
+  padding: "7px 10px",
+  color: "#fff8ea",
+  fontSize: 11,
+  fontWeight: 800,
+  cursor: "pointer",
+  whiteSpace: "nowrap",
+},
   // Insights
   insightSection: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
   insightSectionTitle: { fontSize: 14, fontWeight: 700, color: "#3a3228", marginBottom: 12 },
