@@ -661,6 +661,10 @@ const groceryCategoryItems: Record<string, string[]> = {
               {Object.keys(plan).map((day) => (
                 <button key={day} style={{ ...s.dayChip, ...(selectedDay === day ? s.dayChipActive : {}) }} onClick={() => handleDayChange(day as DayKey)}>
                   <div style={s.dayChipShort}>{day.slice(0, 3)}</div>
+                  <div>
+  <div style={s.heroGreeting}>Plan your week</div>
+  <div style={s.pageTitle}>Meal Planner 📅</div>
+</div>
                 </button>
               ))}
             </div>
@@ -692,6 +696,7 @@ const groceryCategoryItems: Record<string, string[]> = {
             <button style={s.goRecipesBtn} onClick={() => setScreen("recipes")}>+ Browse Recipes</button>
           </div>
         )}
+
 
         {/* ── BUDGET / GROCERIES ── */}
         {screen === "budget" && (
@@ -1065,7 +1070,13 @@ const s: Record<string, React.CSSProperties> = {
   slotTab: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 99, padding: "6px 14px", fontSize: 12, color: "#8b7d6b", cursor: "pointer" },
   slotTabActive: { background: "#e8f0e0", border: "1px solid #7c8a64", color: "#4d5a3d", fontWeight: 700 },
   slotList: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 },
-  slotCard: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", boxShadow: "0 2px 6px rgba(0,0,0,0.03)" },
+  slotCard: {
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 22,
+  padding: "14px 16px",
+  boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
+},
   slotCardActive: { border: "1px solid #7c8a64", background: "#f8fbf6" },
   slotCardLeft: { display: "flex", alignItems: "center", gap: 12 },
   slotEmoji: { fontSize: 28 },
