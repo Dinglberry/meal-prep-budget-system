@@ -14,48 +14,117 @@ export default function ListView() {
     addItem({
       id: newItem.toLowerCase().replace(/\s+/g, "-"),
       name: newItem,
+      category: "Custom",
     });
 
     setNewItem("");
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2>Shopping List 🛒</h2>
+    <div style={{ padding: 18, paddingBottom: 120 }}>
+      <div style={{ fontSize: 28, fontWeight: 900, color: "#5A3827" }}>
+        Shopping List 🧺
+      </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <div style={{ display: "flex", gap: 8, margin: "16px 0" }}>
         <input
           value={newItem}
           onChange={(e) => setNewItem(e.target.value)}
           placeholder="Add grocery item..."
           style={{
             flex: 1,
-            padding: 10,
-            borderRadius: 10,
-            border: "1px solid #ccc",
+            padding: "12px 14px",
+            borderRadius: 18,
+            border: "1.5px solid #E8CFA3",
+            background: "#FFF9EA",
           }}
         />
-
-        <button onClick={handleAdd}>Add</button>
+        <button
+          onClick={handleAdd}
+          style={{
+            border: "none",
+            borderRadius: 18,
+            background: "#7c8a64",
+            color: "#fff8ea",
+            padding: "0 16px",
+            fontWeight: 800,
+          }}
+        >
+          Add
+        </button>
       </div>
 
-      <h3>To Buy</h3>
-      {toBuy.map((item) => (
-        <div key={item.id} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-          <button onClick={() => toggleBought(item.id)}>⬜</button>
-          <span>{item.name}</span>
-          <button onClick={() => removeItem(item.id)}>🗑</button>
-        </div>
-      ))}
+      <Section title="To Buy" items={toBuy} toggleBought={toggleBought} removeItem={removeItem} />
+      <Section title="In Cart" items={bought} toggleBought={toggleBought} removeItem={removeItem} bought />
+    </div>
+  );
+}
 
-      <h3 style={{ marginTop: 20 }}>In Cart</h3>
-      {bought.map((item) => (
-        <div key={item.id} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-          <button onClick={() => toggleBought(item.id)}>✅</button>
-          <span style={{ textDecoration: "line-through" }}>{item.name}</span>
-          <button onClick={() => removeItem(item.id)}>🗑</button>
+function Section({ title, items, toggleBought, removeItem, bought = false }: any) {
+  return (
+    <div style={{ marginTop: 18 }}>
+      <div style={{ fontSize: 13, fontWeight: 900, color: "#5A3827", marginBottom: 10 }}>
+        {title}
+      </div>
+
+      {items.length === 0 ? (
+        <div style={{
+          background: "#FFF9EA",
+          border: "1.5px solid #E8CFA3",
+          borderRadius: 22,
+          padding: 16,
+          color: "#9A7A5A",
+        }}>
+          Nothing here yet.
         </div>
-      ))}
+      ) : (
+        items.map((item: any) => (
+          <div key={item.id} style={{
+            background: "#FFF9EA",
+            border: "1.5px solid #E8CFA3",
+            borderRadius: 22,
+            padding: 14,
+            marginBottom: 10,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            boxShadow: "0 10px 22px rgba(90,56,39,0.08)",
+          }}>
+            <button onClick={() => toggleBought(item.id)} style={{
+              width: 30,
+              height: 30,
+              borderRadius: 12,
+              border: "1.5px solid #E8CFA3",
+              background: bought ? "#7c8a64" : "#FFF6DF",
+              color: bought ? "#fff8ea" : "#5A3827",
+            }}>
+              {bought ? "✓" : ""}
+            </button>
+
+            <div style={{ flex: 1 }}>
+              <div style={{
+                fontWeight: 900,
+                color: "#5A3827",
+                textDecoration: bought ? "line-through" : "none",
+              }}>
+                {item.name}
+              </div>
+              <div style={{ fontSize: 11, color: "#9A7A5A" }}>
+                {item.category || "Custom"}
+              </div>
+            </div>
+
+            <button onClick={() => removeItem(item.id)} style={{
+              border: "none",
+              background: "#F8C8B8",
+              borderRadius: 12,
+              padding: "7px 9px",
+            }}>
+              ✕
+            </button>
+          </div>
+        ))
+      )}
     </div>
   );
 }
