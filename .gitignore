@@ -2,3 +2,6 @@
 dist
 node_modules
 app_encoded*.txt
+
+backups/
+*.zip
