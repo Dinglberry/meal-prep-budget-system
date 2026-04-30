@@ -700,25 +700,32 @@ const groceryCategoryItems: Record<string, string[]> = {
             {/* Grocery category filter */}
             <div style={s.groceryCatRow}>
   {[
-    "All",
-    "Fruits & Vegetables",
-    "Proteins",
-    "Grains & Pasta",
-    "Dairy & Eggs",
-    "Snacks & Treats",
-    "Beverages",
-    "List",
-  ].map((cat) => (
-    <button
-      key={cat}
-      style={{
-  ...s.groceryCatChip,
-  ...(groceryTab === cat ? s.groceryCatChipActive : {}),
-}}
-    >
-      {cat}
-    </button>
-  ))}
+  ["Fruits & Vegetables", "🥬"],
+  ["Proteins", "🥩"],
+  ["Grains & Pasta", "🌾"],
+  ["Dairy & Eggs", "🥛"],
+  ["Snacks & Treats", "🍪"],
+  ["Beverages", "☕"],
+  ["List", "🧺"],
+].map(([cat, icon]) => (
+  <button
+    key={cat}
+    style={{
+      ...s.groceryCategoryCard,
+      ...(groceryTab === cat ? s.groceryCategoryCardActive : {}),
+    }}
+    onClick={() => {
+      if (cat === "List") {
+        setScreen("list");
+      } else {
+        setGroceryTab(cat);
+      }
+    }}
+  >
+    <div style={s.groceryCategoryIcon}>{icon}</div>
+    <div style={s.groceryCategoryLabel}>{cat}</div>
+  </button>
+))}
 </div>
 {groceryTab !== "All" && groceryCategoryItems[groceryTab] && (
   <div style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 16 }}>
@@ -1034,7 +1041,13 @@ const s: Record<string, React.CSSProperties> = {
   budgetTargetLabel: { fontSize: 13, color: "#8b7d6b" },
   budgetTargetInput: { flex: 1, background: "transparent", border: "none", color: "#3a3228", fontSize: 16, fontWeight: 800, outline: "none" },
   resetChip: { background: "#faf6ee", border: "1px solid #e8e0d0", borderRadius: 99, padding: "5px 10px", color: "#8b7d6b", fontSize: 11, cursor: "pointer" },
-  groceryCatRow: { display: "flex", gap: 6, marginBottom: 12, overflowX: "auto" },
+  groceryCatRow: {
+  display: "flex",
+  gap: 10,
+  overflowX: "auto",
+  paddingBottom: 10,
+  marginBottom: 14,
+},
   groceryCatChip: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 99, padding: "5px 12px", fontSize: 12, color: "#8b7d6b", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 },
   groceryList: { display: "flex", flexDirection: "column", gap: 8, marginBottom: 14 },
   groceryRow: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 14, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" },
@@ -1052,7 +1065,38 @@ const s: Record<string, React.CSSProperties> = {
   color: "#fff8ea",
   border: "1px solid #7c8a64",
 },
+groceryCategoryCard: {
+  minWidth: 110,
+  background: "#FFF9EA",
+  border: "1.5px solid #E8CFA3",
+  borderRadius: 24,
+  padding: "12px 10px",
+  display: "flex",
+  flexDirection: "column" as const,
+  alignItems: "center",
+  justifyContent: "center",
+  gap: 8,
+  cursor: "pointer",
+  boxShadow: "0 8px 20px rgba(90,56,39,0.08)",
+  flexShrink: 0,
+},
 
+groceryCategoryCardActive: {
+  background: "#F4F8EE",
+  border: "1.5px solid #7c8a64",
+},
+
+groceryCategoryIcon: {
+  fontSize: 28,
+},
+
+groceryCategoryLabel: {
+  fontSize: 11,
+  fontWeight: 800,
+  color: "#5A3827",
+  textAlign: "center" as const,
+  lineHeight: 1.2,
+},
   // Insights
   insightSection: { background: "#fff", border: "1px solid #e8e0d0", borderRadius: 16, padding: "14px 16px", marginBottom: 14, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" },
   insightSectionTitle: { fontSize: 14, fontWeight: 700, color: "#3a3228", marginBottom: 12 },
