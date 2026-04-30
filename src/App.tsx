@@ -658,15 +658,24 @@ const groceryCategoryItems: Record<string, string[]> = {
           <div style={s.screen}>
             <div style={s.pageHeader}><div style={s.pageTitle}>Meal Plan 📅</div></div>
             <div style={s.dayScroll}>
-              {Object.keys(plan).map((day) => (
-                <button key={day} style={{ ...s.dayChip, ...(selectedDay === day ? s.dayChipActive : {}) }} onClick={() => handleDayChange(day as DayKey)}>
-                  <div style={s.dayChipShort}>{day.slice(0, 3)}</div>
-                  <div>
-  <div style={s.heroGreeting}>Plan your week</div>
-  <div style={s.pageTitle}>Meal Planner 📅</div>
+              <div style={s.pageHeader}>
+  <div>
+    <div style={s.heroGreeting}>Plan your week</div>
+    <div style={s.pageTitle}>Meal Planner 📅</div>
+  </div>
 </div>
-                </button>
-              ))}
+
+<div style={s.dayScroll}>
+  {Object.keys(plan).map((day) => (
+    <button
+      key={day}
+      style={{ ...s.dayChip, ...(selectedDay === day ? s.dayChipActive : {}) }}
+      onClick={() => handleDayChange(day as DayKey)}
+    >
+      <div style={s.dayChipShort}>{day.slice(0, 3)}</div>
+    </button>
+  ))}
+</div>
             </div>
             <div style={s.dayMacroCard}>
               <span style={s.dayMacroItem}>🔥 {dayMacroTotal.calories} cal</span>
